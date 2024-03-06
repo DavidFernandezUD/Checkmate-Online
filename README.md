@@ -39,30 +39,30 @@ interface by passing commands through a console prompt.
     3.5 Press [4] to log out of the game and exit the aplication.
 
 4. Player vs Player game:
-    4.1 Wait until an aponent is selected for your game.
-    4.2 Enter moves in algebraic notation as explained by the leyend.
-    4.3 Type [exit] and confirm with [yes] to exit a game. (The oponent will win inmediately)
-    4.3 After ending the game either with a WIN, LOSS or a DRAW, you will return to the main menu.
+    4.1. Wait until an aponent is selected for your game.
+    4.2. Enter moves in algebraic notation as explained by the leyend.
+    4.3. Type [exit] and confirm with [yes] to exit a game. (The oponent will win inmediately)
+    4.3. After ending the game either with a WIN, LOSS or a DRAW, you will return to the main menu.
 
 5. Player vs AI game:
-    5.1 Select the depth level of the algorithm from the given options.
-    5.2 Type [exit] and confirm with [yes] to exit a game.
-    5.3 After ending the game you will return to the main menu.
+    5.1. Select the depth level of the algorithm from the given options.
+    5.2. Type [exit] and confirm with [yes] to exit a game.
+    5.3. After ending the game you will return to the main menu.
 
 6. Stats:
-    6.1 You will see an overview of your chess stats in the stats menu.
-    6.2 In the top part of the screen you will see your played game count, wins, losses and ELO score.
-    6.3 On the bottom part the results of your last 5 games will be displayed.
+    6.1. You will see an overview of your chess stats in the stats menu.
+    6.2. In the top part of the screen you will see your played game count, wins, losses and ELO score.
+    6.3. On the bottom part the results of your last 5 games will be displayed.
 
 7. Log Out:
-    7.1 While on the main menue ttype [exit] and confirm with a [yes] to log out and exit the application.
+    7.1. While on the main menue ttype [exit] and confirm with a [yes] to log out and exit the application.
 
 ## INTERESTING RESOURCES
 
-[1. Bitboards](https://www.chessprogramming.org/Bitboards)
-[2. Magic Bitboards](https://www.chessprogramming.org/Magic_Bitboards)
-[3. Move Generation](https://www.chessprogramming.org/Move_Generation#Staged_move_generation)
-[4. Negmax](https://www.chessprogramming.org/Negamax)
-[5. Principal Variation Search](https://www.chessprogramming.org/Principal_Variation_Search)
-[6. NNUE](https://www.chessprogramming.org/NNUE)
+- [Bitboards](https://www.chessprogramming.org/Bitboards)
+- [Magic Bitboards](https://www.chessprogramming.org/Magic_Bitboards)
+- [Move Generation](https://www.chessprogramming.org/Move_Generation#Staged_move_generation)
+- [Negmax](https://www.chessprogramming.org/Negamax)
+- [Principal Variation Search](https://www.chessprogramming.org/Principal_Variation_Search)
+- [NNUE](https://www.chessprogramming.org/NNUE)
 
