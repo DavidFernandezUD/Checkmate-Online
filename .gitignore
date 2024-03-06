@@ -1,0 +1,18 @@
+# Ignore compiled binaries
+bin/
+
+# Ignore logs
+logs/
+
+# Ignore any compiled object files
+*.o
+
+# Ignore executables
+bin/
+*.exe
+*.out
+
+# Ignore any temporary files
+*~
+*.swp
+
