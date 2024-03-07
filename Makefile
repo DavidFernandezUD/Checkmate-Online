@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c99 -O2
+CFLAGS = -Wall -Wextra -Werror -std=c99 -oFast
 
 # Directories
 SRC_DIR = src

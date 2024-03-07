@@ -11,7 +11,7 @@ Checkmate Online™ is based an a piece-centric bitboard repressentation of the 
 where each type of peace is represented with a 64 bit number. This allows for efficient bit-wise
 operations in the backend. This speed is necessary for the chess engine to get to suficient
 depth in the move tree. After reaching the specified depth, the algorythm will use an evaluation
-function to theterminen each of the possible positions at that depth and will return the best
+function to determine a score for every possible positions at that depth and will return the best
 move assuming optimum play by booth players.
 
 On the client-server side we have implemented the UCI "Univarsal Chesss Interface" open
@@ -55,7 +55,7 @@ interface by passing commands through a console prompt.
     3. On the bottom part the results of your last 5 games will be displayed.
 
 7. Log Out:
-    1. While on the main menue ttype [exit] and confirm with a [yes] to log out and exit the application.
+    1. While on the main menu type [exit] and confirm with a [yes] to log out and exit the application.
 
 ## INTERESTING RESOURCES
 
