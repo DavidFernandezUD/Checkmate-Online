@@ -2,6 +2,8 @@
 #include <stdint.h>
 
 
+#define EMPTY_BOARD 0ULL
+
 #define GET_BIT(bitboard, index) ((bitboard) & (1ULL << (index)))
 #define SET_BIT(bitboard, index) ((bitboard) |= (1ULL << (index)))
 #define POP_BIT(bitboard, index) (GET_BIT((bitboard), (index)) ? bitboard ^= (1ULL << (index)) : 0)
@@ -56,17 +58,15 @@ void print_bitboard(uint64_t bitboard) {
 uint64_t pawn_attacks[2][64];
 uint64_t knight_attacks[64];
 uint64_t king_attacks[64];
-uint64_t bishop_attacks[64];
-uint64_t rook_attacks[64];
 
 
 // Pawn attacks
 uint64_t get_pawn_attacks(Color color, Square square) {
 
-    uint64_t bitboard = 0ULL;
+    uint64_t bitboard = EMPTY_BOARD;
     SET_BIT(bitboard, square);
 
-    uint64_t attacks = 0ULL;
+    uint64_t attacks = EMPTY_BOARD;
     
     if (color == WHITE) {
         if ((bitboard >> 7) & NOT_A_COL) {
@@ -94,10 +94,10 @@ uint64_t get_pawn_attacks(Color color, Square square) {
 // Knight attacks
 uint64_t get_knight_attacks(Square square) {
     
-    uint64_t bitboard = 0ULL;
+    uint64_t bitboard = EMPTY_BOARD;
     SET_BIT(bitboard, square);
 
-    uint64_t attacks = 0ULL;
+    uint64_t attacks = EMPTY_BOARD;
     
     if (bitboard & NOT_A_COL) {
         attacks |= (bitboard >> 17);
@@ -126,10 +126,10 @@ uint64_t get_knight_attacks(Square square) {
 // King attacks
 uint64_t get_king_attacks(Square square) {
      
-    uint64_t bitboard = 0ULL;
+    uint64_t bitboard = EMPTY_BOARD;
     SET_BIT(bitboard, square);
 
-    uint64_t attacks = 0ULL;
+    uint64_t attacks = EMPTY_BOARD;
     
     if (bitboard & NOT_A_COL) {
         attacks |= (bitboard >> 9);
@@ -153,7 +153,7 @@ uint64_t get_king_attacks(Square square) {
 // Bishop attacks
 uint64_t get_bishop_attacks(Square square) {
     
-    uint64_t attacks = 0ULL;
+    uint64_t attacks = EMPTY_BOARD;
     
     int row = square / 8;
     int col = square % 8;
@@ -175,24 +175,82 @@ uint64_t get_bishop_attacks(Square square) {
     return attacks;
 }
 
+uint64_t get_bishop_attacks_blocked(Square square, uint64_t block) {
+    
+    uint64_t attacks = EMPTY_BOARD;
+    
+    int row = square / 8;
+    int col = square % 8;
+
+    int i, j;
+    for (i = row + 1, j = col + 1; i <= 7 && j <= 7; i++, j++) {
+        SET_BIT(attacks, (i * 8 + j));
+        if (1ULL << (i * 8 + j) & block) break;
+    }
+    for (i = row - 1, j = col + 1; i >= 0 && j <= 7; i--, j++) {
+        SET_BIT(attacks, (i * 8 + j));
+        if (1ULL << (i * 8 + j) & block) break;
+    }
+    for (i = row + 1, j = col - 1; i <= 7 && j >= 0; i++, j--) {
+        SET_BIT(attacks, (i * 8 + j));
+        if (1ULL << (i * 8 + j) & block) break;
+    }
+    for (i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+        SET_BIT(attacks, (i * 8 + j));
+        if (1ULL << (i * 8 + j) & block) break;
+    }
+
+    return attacks;
+}
+
 
 // Rook attacks
 uint64_t get_rook_attacks(Square square) {
     
-    uint64_t attacks = 0ULL;
+    uint64_t attacks = EMPTY_BOARD;
     
-    size_t row = square / 8;
-    size_t col = square % 8;
+    int row = square / 8;
+    int col = square % 8;
     
-    for (size_t i = 1; i <= 6; i++) {
-        if ((i * 8 + col) != square) {
-            SET_BIT(attacks, i * 8 + col);
-        }
-        if ((row * 8 + i) != square) {
-            SET_BIT(attacks, row * 8 + i);
-        }
-        
+    for (int i = row + 1; i <= 6; i++) {
+        SET_BIT(attacks, (i * 8 + col));
     }
+    for (int i = row - 1; i >= 1; i--) {
+        SET_BIT(attacks, (i * 8 + col));
+    }
+    for (int i = col + 1; i <= 6; i++) {
+        SET_BIT(attacks, (row * 8 + i));
+    }
+    for (int i = col - 1; i >= 1; i--) {
+        SET_BIT(attacks, (row * 8 + i));
+    }   
+
+    return attacks;
+}
+
+uint64_t get_rook_attacks_blocked(Square square, uint64_t block) {
+    
+    uint64_t attacks = EMPTY_BOARD;
+    
+    int row = square / 8;
+    int col = square % 8;
+    
+    for (int i = row + 1; i <= 7; i++) {
+        SET_BIT(attacks, (i * 8 + col));
+        if (1ULL << (i * 8 + col) & block) break;
+    }
+    for (int i = row - 1; i >= 0; i--) {
+        SET_BIT(attacks, (i * 8 + col));
+        if (1ULL << (i * 8 + col) & block) break;
+    }
+    for (int i = col + 1; i <= 7; i++) {
+        SET_BIT(attacks, (row * 8 + i));
+        if (1ULL << (row * 8 + i) & block) break;
+    }
+    for (int i = col - 1; i >= 0; i--) {
+        SET_BIT(attacks, (row * 8 + i));
+        if (1ULL << (row * 8 + i) & block) break;
+    }   
 
     return attacks;
 }
@@ -212,22 +270,30 @@ void init_piece_attacks() {
     
         // Initialize king attack table
         king_attacks[square] = get_king_attacks(square);
-
-        // Initialize bishop attack table
-        bishop_attacks[square] = get_bishop_attacks(square); 
-
-        // Initialize rook attack table
-        rook_attacks[square] = get_rook_attacks(square);
-    }
+   }
 }
 
 int main() {
 
     init_piece_attacks();
 
-    for (size_t i = 0; i < 64; i++) {
-        print_bitboard(rook_attacks[i]);
-    }
+    uint64_t block = EMPTY_BOARD;
+    SET_BIT(block, d2);
+    SET_BIT(block, d6);
+    SET_BIT(block, c4);
+    SET_BIT(block, h4);
+
+    uint64_t bitboard = EMPTY_BOARD;
+    SET_BIT(bitboard, d4);
+
+    printf("Rook:\n");
+    print_bitboard(bitboard);
+
+    printf("Blockers:\n");
+    print_bitboard(block);
+
+    printf("Blocked Attacks:\n");
+    print_bitboard(get_rook_attacks_blocked(d4, block));
 
     return 0;
 }
