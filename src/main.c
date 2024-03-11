@@ -8,6 +8,7 @@
 #define SET_BIT(bitboard, index) ((bitboard) |= (1ULL << (index)))
 #define POP_BIT(bitboard, index) (GET_BIT((bitboard), (index)) ? bitboard ^= (1ULL << (index)) : 0)
 
+
 // Usefull bitboard masks
 const uint64_t NOT_A_COL = 18374403900871474942ULL;
 const uint64_t NOT_AB_COL = 18229723555195321596ULL;
@@ -27,6 +28,19 @@ typedef enum {
 } Square;
 
 typedef  enum {WHITE, BLACK} Color;
+
+
+static inline int count_bits(uint64_t bitboard) {
+    
+    int count = 0;
+
+    while (bitboard != 0) {
+        count++;
+        bitboard &= bitboard - 1;
+    }
+
+    return count;
+}
 
 
 void print_bitboard(uint64_t bitboard) {
@@ -294,6 +308,9 @@ int main() {
 
     printf("Blocked Attacks:\n");
     print_bitboard(get_rook_attacks_blocked(d4, block));
+
+    int n_bits = count_bits(block);
+    printf("Blocking piece count: %d\n", n_bits);
 
     return 0;
 }
