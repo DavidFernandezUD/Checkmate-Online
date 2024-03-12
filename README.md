@@ -61,6 +61,8 @@ interface by passing commands through a console prompt.
 
 - [Bitboards](https://www.chessprogramming.org/Bitboards)
 - [Magic Bitboards](https://www.chessprogramming.org/Magic_Bitboards)
+- [Population Count](https://www.chessprogramming.org/Population_Count#cite_note-6)
+- [Bit Scan](https://www.chessprogramming.org/BitScan#Engine_Samples)
 - [Move Generation](https://www.chessprogramming.org/Move_Generation#Staged_move_generation)
 - [Negmax](https://www.chessprogramming.org/Negamax)
 - [Principal Variation Search](https://www.chessprogramming.org/Principal_Variation_Search)

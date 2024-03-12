@@ -30,16 +30,30 @@ typedef enum {
 typedef  enum {WHITE, BLACK} Color;
 
 
+// TODO: Search in CPW for more efficient implementation (bitcount)
 static inline int count_bits(uint64_t bitboard) {
     
     int count = 0;
 
-    while (bitboard != 0) {
+    while (bitboard) {
         count++;
         bitboard &= bitboard - 1;
     }
 
     return count;
+}
+
+
+// TODO: Search in CPW for more efficient implementation (bitscan)
+static inline int get_ls1b_index(uint64_t bitboard) {
+    
+    if (bitboard) {
+
+        // Creates a sequence of trailing ones until the less significant bit, and count it
+        return count_bits((bitboard & -bitboard) - 1);
+    }
+    
+    return -1;
 }
 
 
@@ -311,6 +325,9 @@ int main() {
 
     int n_bits = count_bits(block);
     printf("Blocking piece count: %d\n", n_bits);
+
+    int ls1b = get_ls1b_index(block);
+    printf("Less significant bit at block: %d\n", ls1b);
 
     return 0;
 }
