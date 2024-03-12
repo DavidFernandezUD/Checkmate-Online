@@ -16,6 +16,17 @@ const uint64_t NOT_H_COL = 9187201950435737471ULL;
 const uint64_t NOT_GH_COL = 4557430888798830399ULL;
 
 
+const char* square_to_coordinates[] = {
+    "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
+    "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+    "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+    "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+    "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+    "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+    "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+    "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
+};
+
 typedef enum {
     a8, b8, c8, d8, e8, f8, g8, h8,
     a7, b7, c7, d7, e7, f7, g7, h7,
@@ -328,6 +339,7 @@ int main() {
 
     int ls1b = get_ls1b_index(block);
     printf("Less significant bit at block: %d\n", ls1b);
+    printf("Less significant bit coordinates: %s\n", square_to_coordinates[ls1b]);
 
     return 0;
 }
