@@ -312,34 +312,36 @@ void init_piece_attacks() {
    }
 }
 
+
+uint64_t set_occupancy(int index, int bits_in_mask, uint64_t attack_mask) {
+    
+    // Initialize occupancy mask
+    uint64_t occupancy = EMPTY_BOARD;
+
+    for (int i = 0; i < bits_in_mask; i++) {
+        
+        int square = get_ls1b_index(attack_mask);
+        POP_BIT(attack_mask, square);
+
+        if (index & (1 << i)) {
+            occupancy |= (1ULL << square);
+        }
+    }
+
+    return occupancy;
+}
+
+
 int main() {
 
     init_piece_attacks();
 
-    uint64_t block = EMPTY_BOARD;
-    SET_BIT(block, d2);
-    SET_BIT(block, d6);
-    SET_BIT(block, c4);
-    SET_BIT(block, h4);
+    uint64_t attack_mask = get_bishop_attacks(d4);
 
-    uint64_t bitboard = EMPTY_BOARD;
-    SET_BIT(bitboard, d4);
-
-    printf("Rook:\n");
-    print_bitboard(bitboard);
-
-    printf("Blockers:\n");
-    print_bitboard(block);
-
-    printf("Blocked Attacks:\n");
-    print_bitboard(get_rook_attacks_blocked(d4, block));
-
-    int n_bits = count_bits(block);
-    printf("Blocking piece count: %d\n", n_bits);
-
-    int ls1b = get_ls1b_index(block);
-    printf("Less significant bit at block: %d\n", ls1b);
-    printf("Less significant bit coordinates: %s\n", square_to_coordinates[ls1b]);
+    for (int i = 0; i < 100; i++) {
+        print_bitboard(set_occupancy(i, count_bits(attack_mask), attack_mask));
+        getchar();
+    }
 
     return 0;
 }
