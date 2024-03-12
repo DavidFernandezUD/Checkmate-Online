@@ -7,14 +7,16 @@
 
 
 int main() {
-
-    printf("Hello, World!\n");
     
     srand(time(NULL));
 
     init_piece_attacks();
 
-    print_bitboard(get_random_bitboard());
+    print_bitboard(get_random_magic_number());
+    print_bitboard(get_random_magic_number());
+    print_bitboard(get_random_magic_number());
+    print_bitboard(get_random_magic_number());
+    print_bitboard(get_random_magic_number());
 
     return 0;
 }
