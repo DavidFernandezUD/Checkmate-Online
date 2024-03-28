@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
+#include <assert.h>
 #include "bitboard.h"
+#include "random.h"
 
 
 // Usefull bitboard masks
@@ -29,7 +33,7 @@ const int bishop_relevant_bits[64] = {
     6, 5, 5, 5, 5, 5, 5, 6
 };
 
-const int bishop_rook_bits[64] = {
+const int rook__relevant_bits[64] = {
     12, 11, 11, 11, 11, 11, 11, 12,
     11, 10, 10, 10, 10, 10, 10, 11,
     11, 10, 10, 10, 10, 10, 10, 11,
@@ -275,6 +279,7 @@ uint64_t get_rook_attacks(Square square) {
     return attacks;
 }
 
+
 uint64_t get_rook_attacks_blocked(Square square, uint64_t block) {
     
     uint64_t attacks = EMPTY_BOARD;
@@ -303,6 +308,7 @@ uint64_t get_rook_attacks_blocked(Square square, uint64_t block) {
 }
 
 
+// Magic numbers
 uint64_t set_occupancy(int index, int bits_in_mask, uint64_t attack_mask) {
     
     // Initialize occupancy mask
@@ -319,6 +325,76 @@ uint64_t set_occupancy(int index, int bits_in_mask, uint64_t attack_mask) {
     }
 
     return occupancy;
+}
+
+
+uint64_t find_magic_number(Square square, int relevant_bits, Piece piece) {
+
+    assert(piece == ROOK || piece == BISHOP);
+
+    // Init possible occupancies array (4096 in the case of rooks)
+    uint64_t occupancies[4096];
+
+    // Initialize attack tables;
+    uint64_t attacks[4096];
+
+    // Initialize used attacks
+    uint64_t used_attacks[4096];
+
+    // Initialize attack mask for current piece
+    uint64_t attack_mask = (piece == ROOK) ? get_rook_attacks(square) : get_bishop_attacks(square);
+
+    // Initialize occupancy indices
+    int occupancy_indexes = 1 << relevant_bits;
+    for (int i = 0; i < occupancy_indexes; i++) {
+        occupancies[i] = set_occupancy(i, relevant_bits, attack_mask);
+        attacks[i] = (piece == ROOK) ? get_bishop_attacks_blocked(square, occupancies[i]) : get_rook_attacks_blocked(square, occupancies[i]);
+    }
+
+    // Check magic numbers
+    int MAX_NUMBERS_GENERATED = 1000000000;
+    for (int i = 0; i < MAX_NUMBERS_GENERATED; i++) {
+
+        // Generate magic number candidate
+        uint64_t magic_number = get_random_magic_number();
+
+        // Discard invalid magic numbers
+        if (count_bits((attack_mask * magic_number) & 0xFF00000000000000) < 6) continue;
+    
+        // Initialize used attacks to 0
+        memset(used_attacks, 0ULL, sizeof(used_attacks));
+
+        bool fail = false;
+        for (int j = 0; j < occupancy_indexes && !fail; j++) {
+
+            int magic_index = (occupancies[j] * magic_number) >> (64 - relevant_bits);
+
+            if (used_attacks[magic_index] == 0ULL) {
+                used_attacks[magic_index] = attacks[j];
+            } else if (used_attacks[magic_index] != attacks[j]) {
+                // Magic number doesn't work, try other one
+                fail = true;
+            }
+        }
+
+        if (!fail) {
+            return magic_number;
+        }
+    }
+
+    // If no suittable magic number was found
+    printf("Magic number not found!");
+    return 0ULL;
+}
+
+
+void init_magic_numbers() {
+
+    for (int square = 0; square < 64; square++) {
+
+        uint64_t magic = find_magic_number(square, bishop_relevant_bits[square], BISHOP);
+        printf("%lu\n", magic);
+    }
 }
 
 

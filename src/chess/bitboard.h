@@ -24,7 +24,9 @@ typedef enum {
     a1, b1, c1, d1, e1, f1, g1, h1
 } Square;
 
-typedef  enum {WHITE, BLACK} Color;
+typedef enum {WHITE, BLACK} Color;
+
+typedef enum {PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING} Piece;
 
 
 // Bitboard utilities
@@ -54,9 +56,14 @@ uint64_t get_rook_attacks_blocked(Square square, uint64_t block);
 uint64_t set_occupancy(int index, int bits_in_mask, uint64_t attack_mask);
 
 
+// Magic number generation
+uint64_t find_magic_number(Square square, int relevant_bits, Piece piece);
+
+void init_magic_numbers();
+
+
 // Attack table Initialization
 void init_piece_attacks();
 
 
 #endif // _BITBOARD_H
-
