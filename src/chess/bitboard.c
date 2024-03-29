@@ -22,6 +22,73 @@ uint64_t king_attacks[64];
 
 
 // Magic numbers
+uint64_t bishop_magic_numbers[64] = {
+    2306441229572768042ULL,
+    4755890013980525568ULL,
+    4901086412658835524ULL,
+    27097464877105152ULL,
+    669910739179274752ULL,
+    22676329960379392ULL,
+    576610577944674320ULL,
+    6791717955043842ULL,
+    11606341423070777412ULL,
+    4616024691381249ULL,
+    1189020831450398724ULL,
+    9511621105778690048ULL,
+    9511613687295901718ULL,
+    20547674746912804ULL,
+    288265697968263184ULL,
+    288240271791328353ULL,
+    180144029286009348ULL,
+    254734858285756576ULL,
+    1302785987448832ULL,
+    4611861940564721682ULL,
+    22024730968204ULL,
+    1276533268283392ULL,
+    20875881826222080ULL,
+    72605264528128ULL,
+    579099599537438976ULL,
+    3377699720693888ULL,
+    4790026164502540ULL,
+    144467238492184576ULL,
+    576466250014655492ULL,
+    777127356006656ULL,
+    10415682240389122ULL,
+    9223934986810040896ULL,
+    10376296943079964672ULL,
+    27339356626788450ULL,
+    2315976142735278180ULL,
+    16432509179026507264ULL,
+    1171551771781234944ULL,
+    18416819768608ULL,
+    217298819728021632ULL,
+    5910974736430530628ULL,
+    9228040866088615936ULL,
+    144118555363774724ULL,
+    1170935972137816082ULL,
+    2341871806534648064ULL,
+    4505936358016404ULL,
+    284842281402368ULL,
+    9242022044353169540ULL,
+    37720120782954504ULL,
+    36169612891259424ULL,
+    5771364056883857632ULL,
+    4755801241401034240ULL,
+    2667399921384161329ULL,
+    4503599628567104ULL,
+    14122745888ULL,
+    2307114113409491080ULL,
+    9295476085259141394ULL,
+    325385081760268296ULL,
+    90085186700853248ULL,
+    13836183955189011220ULL,
+    3494793322952721440ULL,
+    40532396715622400ULL,
+    2262050ULL,
+    2306124624853076056ULL,
+    155656761633996800ULL
+};
+
 uint64_t rook_magic_numbers[64] = {
     180146184118141000ULL,
     153122664439874560ULL,
@@ -89,72 +156,15 @@ uint64_t rook_magic_numbers[64] = {
     1153273348327735681ULL 
 };
 
-uint64_t bishop_magic_numbers[64] = {
-    2306441229572768042ULL,
-    4755890013980525568ULL,
-    4901086412658835524ULL,
-    27097464877105152ULL,
-    669910739179274752ULL,
-    22676329960379392ULL,
-    576610577944674320ULL,
-    6791717955043842ULL,
-    11606341423070777412ULL,
-    4616024691381249ULL,
-    1189020831450398724ULL,
-    9511621105778690048ULL,
-    9511613687295901718ULL,
-    20547674746912804ULL,
-    288265697968263184ULL,
-    288240271791328353ULL,
-    180144029286009348ULL,
-    254734858285756576ULL,
-    1302785987448832ULL,
-    4611861940564721682ULL,
-    22024730968204ULL,
-    1276533268283392ULL,
-    20875881826222080ULL,
-    72605264528128ULL,
-    579099599537438976ULL,
-    3377699720693888ULL,
-    4790026164502540ULL,
-    144467238492184576ULL,
-    576466250014655492ULL,
-    777127356006656ULL,
-    10415682240389122ULL,
-    9223934986810040896ULL,
-    10376296943079964672ULL,
-    27339356626788450ULL,
-    2315976142735278180ULL,
-    16432509179026507264ULL,
-    1171551771781234944ULL,
-    18416819768608ULL,
-    217298819728021632ULL,
-    5910974736430530628ULL,
-    9228040866088615936ULL,
-    144118555363774724ULL,
-    1170935972137816082ULL,
-    2341871806534648064ULL,
-    4505936358016404ULL,
-    284842281402368ULL,
-    9242022044353169540ULL,
-    37720120782954504ULL,
-    36169612891259424ULL,
-    5771364056883857632ULL,
-    4755801241401034240ULL,
-    2667399921384161329ULL,
-    4503599628567104ULL,
-    14122745888ULL,
-    2307114113409491080ULL,
-    9295476085259141394ULL,
-    325385081760268296ULL,
-    90085186700853248ULL,
-    13836183955189011220ULL,
-    3494793322952721440ULL,
-    40532396715622400ULL,
-    2262050ULL,
-    2306124624853076056ULL,
-    155656761633996800ULL
-};
+
+// Sliding piece attack masks
+uint64_t bishop_attack_masks[64];
+uint64_t rook_attack_masks[64];
+
+
+// Sliding piece attack tables [square][occupancy]
+uint64_t bishop_attacks[64][512];
+uint64_t rook_attacks[64][4096];
 
 
 // Maximum number of squares a rook or bishop in each square is able to accupy
@@ -337,7 +347,7 @@ uint64_t get_king_attacks(Square square) {
 
 
 // Bishop attacks
-uint64_t get_bishop_attacks(Square square) {
+uint64_t get_bishop_attack_mask(Square square) {
     
     uint64_t attacks = EMPTY_BOARD;
     
@@ -392,7 +402,7 @@ uint64_t get_bishop_attacks_blocked(Square square, uint64_t block) {
 
 
 // Rook attacks
-uint64_t get_rook_attacks(Square square) {
+uint64_t get_rook_attack_mask(Square square) {
     
     uint64_t attacks = EMPTY_BOARD;
     
@@ -468,7 +478,7 @@ uint64_t find_magic_number(Square square, int relevant_bits, Piece piece) {
 
     assert(piece == ROOK || piece == BISHOP);
 
-    // Init possible occupancies array (4096 in the case of rooks)
+    // Init possible occupancies
     uint64_t occupancies[4096];
 
     // Initialize attack tables;
@@ -478,13 +488,13 @@ uint64_t find_magic_number(Square square, int relevant_bits, Piece piece) {
     uint64_t used_attacks[4096];
 
     // Initialize attack mask for current piece
-    uint64_t attack_mask = (piece == ROOK) ? get_rook_attacks(square) : get_bishop_attacks(square);
+    uint64_t attack_mask = (piece == ROOK) ? get_rook_attack_mask(square) : get_bishop_attack_mask(square);
 
     // Initialize occupancy indices
     int occupancy_indexes = 1 << relevant_bits;
     for (int i = 0; i < occupancy_indexes; i++) {
         occupancies[i] = set_occupancy(i, relevant_bits, attack_mask);
-        attacks[i] = (piece == ROOK) ? get_bishop_attacks_blocked(square, occupancies[i]) : get_rook_attacks_blocked(square, occupancies[i]);
+        attacks[i] = (piece == ROOK) ? get_rook_attacks_blocked(square, occupancies[i]) : get_bishop_attacks_blocked(square, occupancies[i]);
     }
 
     // Check magic numbers
@@ -508,12 +518,11 @@ uint64_t find_magic_number(Square square, int relevant_bits, Piece piece) {
             if (used_attacks[magic_index] == 0ULL) {
                 used_attacks[magic_index] = attacks[j];
             } else if (used_attacks[magic_index] != attacks[j]) {
-
                 // Magic number doesn't work, try other one
                 fail = true;
             }
         }
-
+        
         if (!fail) {
             return magic_number;
         }
@@ -537,6 +546,66 @@ void init_magic_numbers() {
     }
 }
 
+
+void init_bishop_attacks() {
+
+    for (int square = 0; square < 64; square++) {
+        
+        bishop_attack_masks[square] = get_bishop_attack_mask(square);
+
+        // init occupancy indicies
+        int occupancy_indices = (1 << bishop_relevant_bits[square]);
+
+        // loop over occupancy indicies
+        for (int i = 0; i < occupancy_indices; i++) {
+
+            uint64_t occupancy = set_occupancy(i, bishop_relevant_bits[square], bishop_attack_masks[square]);
+
+            int magic_index = (occupancy * bishop_magic_numbers[square]) >> (64 - bishop_relevant_bits[square]);
+
+            bishop_attacks[square][magic_index] = get_bishop_attacks_blocked(square, occupancy);
+        }
+    }
+}
+
+
+void init_rook_attacks() {
+
+    for (int square = 0; square < 64; square++) {
+
+        rook_attack_masks[square] = get_rook_attack_mask(square);
+        
+        // init occupancy indicies
+        int occupancy_indices = (1 << rook_relevant_bits[square]);
+
+        // loop over occupancy indicies
+        for (int i = 0; i < occupancy_indices; i++) {
+
+            uint64_t occupancy = set_occupancy(i, rook_relevant_bits[square], rook_attack_masks[square]);
+            int magic_index = (occupancy * rook_magic_numbers[square]) >> (64 - rook_relevant_bits[square]);
+            rook_attacks[square][magic_index] = get_rook_attacks_blocked(square, occupancy);
+        }
+    }
+}
+
+// TODO: Make static inline
+uint64_t get_bishop_attacks(int square, uint64_t occupancy) {
+
+    occupancy &= bishop_attack_masks[square];
+    occupancy *= bishop_magic_numbers[square];
+    occupancy >>= 64 - bishop_relevant_bits[square];
+
+    return bishop_attacks[square][occupancy];
+}
+
+uint64_t get_rook_attacks(int square, uint64_t occupancy) {
+
+    occupancy &= rook_attack_masks[square];
+    occupancy *= rook_magic_numbers[square];
+    occupancy >>= 64 - rook_relevant_bits[square];
+    
+    return rook_attacks[square][occupancy];
+}
 
 // Generate attack tables
 void init_piece_attacks() {

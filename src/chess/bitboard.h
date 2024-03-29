@@ -42,12 +42,12 @@ uint64_t get_king_attacks(Square square);
 
 
 // Sliding pieces attack masks
-uint64_t get_bishop_attacks(Square square);
+uint64_t get_bishop_attack_mask(Square square);
 
 uint64_t get_bishop_attacks_blocked(Square square, uint64_t block);
    
 
-uint64_t get_rook_attacks(Square square);
+uint64_t get_rook_attack_mask(Square square);
    
 uint64_t get_rook_attacks_blocked(Square square, uint64_t block);
 
@@ -60,6 +60,16 @@ uint64_t set_occupancy(int index, int bits_in_mask, uint64_t attack_mask);
 uint64_t find_magic_number(Square square, int relevant_bits, Piece piece);
 
 void init_magic_numbers();
+
+
+// Sliding piece attacks
+void init_bishop_attacks();
+
+void init_rook_attacks();
+
+uint64_t get_bishop_attacks(int square, uint64_t occupancy);
+
+uint64_t get_rook_attacks(int square, uint64_t occupancy);
 
 
 // Attack table Initialization

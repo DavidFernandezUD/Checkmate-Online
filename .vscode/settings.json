@@ -1,5 +1,12 @@
 {
     "files.associations": {
         "stdint.h": "c"
-    }
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/david/code/c/Checkmate-Online/bin",
+            "binaryPath": "/home/david/code/c/Checkmate-Online/bin/main",
+            "binaryArgs": []
+        }
+    ]
 }
