@@ -30,7 +30,6 @@ uint64_t get_bishop_attack_mask(Square square);
 
 uint64_t get_bishop_attacks_blocked(Square square, uint64_t block);
    
-
 uint64_t get_rook_attack_mask(Square square);
    
 uint64_t get_rook_attacks_blocked(Square square, uint64_t block);
@@ -54,6 +53,8 @@ void init_rook_attacks();
 uint64_t get_bishop_attacks(int square, uint64_t occupancy);
 
 uint64_t get_rook_attacks(int square, uint64_t occupancy);
+
+uint64_t get_queen_attacks(int square, uint64_t occupancy);
 
 
 // Attack table Initialization

@@ -9,19 +9,30 @@
 
 int main() {
 
-    Position pos = init_position();
+    // Position pos;
 
-    // SET_BIT(pos.bitboards[r], e4);
-    // SET_BIT(pos.bitboards[P], f2);
-    // SET_BIT(pos.bitboards[N], d6);
+    // init_position(&pos);
 
-    // pos.turn = BLACK;
-    // pos.enpassant = e4;
-    // pos.castling = WK | WQ | BQ;
+    // parse_fen(&pos, TRICKY_POSITION);
 
-    parse_fen(&pos, START_POSITION);
+    // print_position(pos);
 
-    print_position(pos);
+    init_piece_attacks();
+
+    uint64_t bb = EMPTY_BITBOARD;
+
+    SET_BIT(bb, e7);
+    SET_BIT(bb, e3);
+    SET_BIT(bb, g4);
+    SET_BIT(bb, c5);
+    SET_BIT(bb, b7);
+    SET_BIT(bb, g6);
+    SET_BIT(bb, h1);
+    SET_BIT(bb, d3);
+
+    print_bitboard(bb);
+
+    print_bitboard(get_queen_attacks(e4, bb));
 
     return 0;
 }

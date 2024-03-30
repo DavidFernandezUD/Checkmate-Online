@@ -76,10 +76,10 @@ void print_bitboard(uint64_t bitboard);
 void print_position(Position position);
 
 
-// Position creation and initialization
-Position init_position();
-
+// Position initialization and parsing
 void parse_fen(Position* position, char* fen);
+
+void init_position(Position* position);
 
 
 #endif // _BITBOARD_H

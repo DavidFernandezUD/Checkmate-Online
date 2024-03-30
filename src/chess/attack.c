@@ -447,6 +447,7 @@ void init_rook_attacks() {
     }
 }
 
+
 // TODO: Make static inline
 uint64_t get_bishop_attacks(int square, uint64_t occupancy) {
 
@@ -457,6 +458,7 @@ uint64_t get_bishop_attacks(int square, uint64_t occupancy) {
     return bishop_attacks[square][occupancy];
 }
 
+
 uint64_t get_rook_attacks(int square, uint64_t occupancy) {
 
     occupancy &= rook_attack_masks[square];
@@ -465,6 +467,25 @@ uint64_t get_rook_attacks(int square, uint64_t occupancy) {
     
     return rook_attacks[square][occupancy];
 }
+
+
+uint64_t get_queen_attacks(int square, uint64_t occupancy) {
+
+    uint64_t bishop_occupancy = occupancy;
+    uint64_t rook_occupancy = occupancy;
+
+    bishop_occupancy &= bishop_attack_masks[square];
+    bishop_occupancy *= bishop_magic_numbers[square];
+    bishop_occupancy >>= 64 - bishop_relevant_bits[square];
+
+    rook_occupancy &= rook_attack_masks[square];
+    rook_occupancy *= rook_magic_numbers[square];
+    rook_occupancy >>= 64 - rook_relevant_bits[square];
+    
+    return bishop_attacks[square][bishop_occupancy] | rook_attacks[square][rook_occupancy];
+
+}
+
 
 // Generate attack tables
 void init_piece_attacks() {

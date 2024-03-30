@@ -109,16 +109,6 @@ void print_position(Position position) {
 }
 
 
-Position init_position() {
-
-    Position position;
-
-    parse_fen(&position, START_POSITION);
-
-    return position;
-}
-
-
 void parse_fen(Position* position, char* fen) {
 
     memset(position->bitboards, 0ULL, sizeof(position->bitboards));
@@ -192,4 +182,9 @@ void parse_fen(Position* position, char* fen) {
 
         position->enpassant = row * 8 + col;
     }
+}
+
+
+void init_position(Position* position) {
+    parse_fen(position, START_POSITION);
 }
