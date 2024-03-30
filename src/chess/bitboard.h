@@ -63,9 +63,14 @@ typedef struct {
 } Position;
 
 
+// Utility functions
 void print_bitboard(uint64_t bitboard);
 
 void print_position(Position position);
+
+
+// Position creation and initialization
+Position init_position();
 
 
 #endif // _BITBOARD_H

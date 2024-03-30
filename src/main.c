@@ -22,15 +22,15 @@ int main() {
 
     // print_position();
 
-    Position pos = {};
+    Position pos = init_position();
 
-    SET_BIT(pos.bitboards[r], e4);
-    SET_BIT(pos.bitboards[P], f2);
-    SET_BIT(pos.bitboards[N], d6);
+    // SET_BIT(pos.bitboards[r], e4);
+    // SET_BIT(pos.bitboards[P], f2);
+    // SET_BIT(pos.bitboards[N], d6);
 
-    pos.turn = BLACK;
-    pos.enpassant = e4;
-    pos.castling = WK | WQ | BQ;
+    // pos.turn = BLACK;
+    // pos.enpassant = e4;
+    // pos.castling = WK | WQ | BQ;
 
     print_position(pos);
 
