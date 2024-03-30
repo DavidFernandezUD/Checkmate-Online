@@ -11,6 +11,13 @@
 #define POP_BIT(bitboard, square) ((bitboard) &= ~(1ULL << (square)))
 
 
+// Usefull FEN strings
+#define EMPTY_BOARD "8/8/8/8/8/8/8/8 w - - "
+#define START_POSITION "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 "
+#define TRICKY_POSITION "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 "
+#define KILLER_POSITION "rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1"
+
+
 // enum utils
 typedef enum {
     a8, b8, c8, d8, e8, f8, g8, h8,
@@ -71,6 +78,8 @@ void print_position(Position position);
 
 // Position creation and initialization
 Position init_position();
+
+void parse_fen(Position* position, char* fen);
 
 
 #endif // _BITBOARD_H

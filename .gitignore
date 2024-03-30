@@ -1,8 +1,16 @@
-# Ignore compiled binaries
+# Ignor IDE specific files
+.vscode
+*.iml
+*.iws
+*.ipr
+.idea/
+
+# Ignore binaries
 bin/
 
 # Ignore logs
 logs/
+*.log
 
 # Ignore any compiled object files
 *.o

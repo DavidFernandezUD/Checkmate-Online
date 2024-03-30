@@ -119,10 +119,10 @@ static inline int get_ls1b_index(uint64_t bitboard) {
 // Pawn attacks
 uint64_t get_pawn_attacks(Color color, Square square) {
 
-    uint64_t bitboard = EMPTY_BOARD;
+    uint64_t bitboard = EMPTY_BITBOARD;
     SET_BIT(bitboard, square);
 
-    uint64_t attacks = EMPTY_BOARD;
+    uint64_t attacks = EMPTY_BITBOARD;
     
     if (color == WHITE) {
         if ((bitboard >> 7) & NOT_A_COL) {
@@ -149,10 +149,10 @@ uint64_t get_pawn_attacks(Color color, Square square) {
 // Knight attacks
 uint64_t get_knight_attacks(Square square) {
     
-    uint64_t bitboard = EMPTY_BOARD;
+    uint64_t bitboard = EMPTY_BITBOARD;
     SET_BIT(bitboard, square);
 
-    uint64_t attacks = EMPTY_BOARD;
+    uint64_t attacks = EMPTY_BITBOARD;
     
     if (bitboard & NOT_A_COL) {
         attacks |= (bitboard >> 17);
@@ -181,10 +181,10 @@ uint64_t get_knight_attacks(Square square) {
 // King attacks
 uint64_t get_king_attacks(Square square) {
      
-    uint64_t bitboard = EMPTY_BOARD;
+    uint64_t bitboard = EMPTY_BITBOARD;
     SET_BIT(bitboard, square);
 
-    uint64_t attacks = EMPTY_BOARD;
+    uint64_t attacks = EMPTY_BITBOARD;
     
     if (bitboard & NOT_A_COL) {
         attacks |= (bitboard >> 9);
@@ -208,7 +208,7 @@ uint64_t get_king_attacks(Square square) {
 // Bishop attacks
 uint64_t get_bishop_attack_mask(Square square) {
     
-    uint64_t attacks = EMPTY_BOARD;
+    uint64_t attacks = EMPTY_BITBOARD;
     
     int row = square / 8;
     int col = square % 8;
@@ -233,7 +233,7 @@ uint64_t get_bishop_attack_mask(Square square) {
 
 uint64_t get_bishop_attacks_blocked(Square square, uint64_t block) {
     
-    uint64_t attacks = EMPTY_BOARD;
+    uint64_t attacks = EMPTY_BITBOARD;
     
     int row = square / 8;
     int col = square % 8;
@@ -263,7 +263,7 @@ uint64_t get_bishop_attacks_blocked(Square square, uint64_t block) {
 // Rook attacks
 uint64_t get_rook_attack_mask(Square square) {
     
-    uint64_t attacks = EMPTY_BOARD;
+    uint64_t attacks = EMPTY_BITBOARD;
     
     int row = square / 8;
     int col = square % 8;
@@ -287,7 +287,7 @@ uint64_t get_rook_attack_mask(Square square) {
 
 uint64_t get_rook_attacks_blocked(Square square, uint64_t block) {
     
-    uint64_t attacks = EMPTY_BOARD;
+    uint64_t attacks = EMPTY_BITBOARD;
     
     int row = square / 8;
     int col = square % 8;
@@ -317,7 +317,7 @@ uint64_t get_rook_attacks_blocked(Square square, uint64_t block) {
 uint64_t set_occupancy(int index, int bits_in_mask, uint64_t attack_mask) {
     
     // Initialize occupancy mask
-    uint64_t occupancy = EMPTY_BOARD;
+    uint64_t occupancy = EMPTY_BITBOARD;
 
     for (int i = 0; i < bits_in_mask; i++) {
         

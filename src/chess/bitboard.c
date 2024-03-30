@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
+#include <ctype.h>
 #include "bitboard.h"
 #include "attack.h"
 
@@ -98,57 +100,96 @@ void print_position(Position position) {
     printf("\n    a b c d e f g h\n\n");
 
     printf("Turn:      %s\n", (position.turn == WHITE) ? "white" : "black");
-    printf("Enpassant: %s\n", (position.enpassant != null_square) ? square_to_coordinates[position.enpassant] : "-----");
-    printf("Castling:  %c%c%c%c\n\n", (position.castling & WK) ? 'K' : '-',
+    printf("Castling:  %c%c%c%c\n", (position.castling & WK) ? 'K' : '-',
                                       (position.castling & WQ) ? 'Q' : '-',
                                       (position.castling & BK) ? 'k' : '-',
                                       (position.castling & BQ) ? 'q' : '-'
     );
+    printf("Enpassant: %s\n\n", (position.enpassant != null_square) ? square_to_coordinates[position.enpassant] : "no");
 }
 
 
 Position init_position() {
 
-    Position position = {};
+    Position position;
 
-    SET_BIT(position.bitboards[P], a2);
-    SET_BIT(position.bitboards[P], b2);
-    SET_BIT(position.bitboards[P], c2);
-    SET_BIT(position.bitboards[P], d2);
-    SET_BIT(position.bitboards[P], e2);
-    SET_BIT(position.bitboards[P], f2);
-    SET_BIT(position.bitboards[P], g2);
-    SET_BIT(position.bitboards[P], h2);
-    SET_BIT(position.bitboards[R], a1);
-    SET_BIT(position.bitboards[R], h1);
-    SET_BIT(position.bitboards[N], b1);
-    SET_BIT(position.bitboards[N], g1);
-    SET_BIT(position.bitboards[B], c1);
-    SET_BIT(position.bitboards[B], f1);
-    SET_BIT(position.bitboards[Q], d1);
-    SET_BIT(position.bitboards[K], e1);
-
-    SET_BIT(position.bitboards[p], a7);
-    SET_BIT(position.bitboards[p], b7);
-    SET_BIT(position.bitboards[p], c7);
-    SET_BIT(position.bitboards[p], d7);
-    SET_BIT(position.bitboards[p], e7);
-    SET_BIT(position.bitboards[p], f7);
-    SET_BIT(position.bitboards[p], g7);
-    SET_BIT(position.bitboards[p], h7);
-    SET_BIT(position.bitboards[r], a8);
-    SET_BIT(position.bitboards[r], h8);
-    SET_BIT(position.bitboards[n], b8);
-    SET_BIT(position.bitboards[n], g8);
-    SET_BIT(position.bitboards[b], c8);
-    SET_BIT(position.bitboards[b], f8);
-    SET_BIT(position.bitboards[q], d8);
-    SET_BIT(position.bitboards[k], e8);
-
-
-    position.turn = WHITE;
-    position.enpassant = null_square;
-    position.castling = WK | WQ | BQ | BK;
+    parse_fen(&position, START_POSITION);
 
     return position;
+}
+
+
+void parse_fen(Position* position, char* fen) {
+
+    memset(position->bitboards, 0ULL, sizeof(position->bitboards));
+    memset(position->occupancies, 0ULL, sizeof(position->occupancies));
+
+    position->turn = WHITE;
+    position->enpassant = null_square;
+    position->castling = 0;
+
+    for (int row = 0; row < 8; row++) {
+        for (int col = 0; col < 8; ) {
+
+            int square = row * 8 + col;
+            int character = *fen;
+
+            if (isalpha(character)) {
+                
+                SET_BIT(position->bitboards[CHAR_TO_PIECE[character]], square);
+
+                if (isupper(character)) {
+                    SET_BIT(position->occupancies[WHITE], square);
+                } else {
+                    SET_BIT(position->occupancies[BLACK], square);
+                }
+                
+                col++;
+                fen++;
+            }
+
+            if (isdigit(character)) {
+
+                int num = character - '0';
+
+                col += num;
+                fen++;
+            }
+
+            if (character == '/') {
+                fen++;
+            }
+        }
+    }
+
+    // Turn
+    fen++;
+    position->turn = (*fen == 'w') ? WHITE : BLACK;
+
+    // Castling rights
+    fen += 2;
+    while (*fen != ' ') {
+
+        switch (*fen) {
+            case 'K': position->castling |= WK;
+                break;
+            case 'Q': position->castling |= WQ;
+                break;
+            case 'k': position->castling |= BK;
+                break;
+            case 'q': position->castling |= BQ;
+                break;
+        }
+
+        fen++;
+    }
+
+    // En passant square
+    fen++;
+    if (*fen != '-') {
+        int row = 8 - (fen[1] - '0');
+        int col = fen[0] - 'a';
+
+        position->enpassant = row * 8 + col;
+    }
 }
