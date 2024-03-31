@@ -23,4 +23,3 @@ uint64_t get_random_magic_number() {
     // This lowers the density of the random bitboards
     return get_random_bitboard() & get_random_bitboard() & get_random_bitboard();
 }
-

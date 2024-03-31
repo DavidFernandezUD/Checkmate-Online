@@ -17,6 +17,12 @@
 typedef enum {ROOK, BISHOP} IsBishop;
 
 
+// Piece attack tables
+extern uint64_t pawn_attacks[2][64];
+extern uint64_t knight_attacks[64];
+extern uint64_t king_attacks[64];
+
+
 // Leaper piece attacks
 uint64_t get_pawn_attacks(Color color, Square square);
 

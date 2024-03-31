@@ -11,4 +11,3 @@ uint64_t get_random_bitboard();
 
 
 #endif // _RANDOM_H
-

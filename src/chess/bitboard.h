@@ -31,7 +31,7 @@ typedef enum {
     null_square
 } Square;
 
-typedef enum {WHITE, BLACK} Color;
+typedef enum {WHITE, BLACK, BOTH} Color;
 
 typedef enum {P, N, B, R, Q, K, p, n, b, r, q, k} Piece;
 
@@ -60,8 +60,9 @@ typedef struct {
     /* ==== Occupancy bitboards ==== 
     0 -> white occupancies
     1 -> black occupancies
+    2 -> white + black occupancies
     */
-    uint64_t occupancies[2];
+    uint64_t occupancies[3];
 
     Color turn;
     Square enpassant;

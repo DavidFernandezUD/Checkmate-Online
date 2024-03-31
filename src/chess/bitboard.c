@@ -133,7 +133,8 @@ void parse_fen(Position* position, char* fen) {
                 } else {
                     SET_BIT(position->occupancies[BLACK], square);
                 }
-                
+                SET_BIT(position->occupancies[BOTH], square);
+
                 col++;
                 fen++;
             }
