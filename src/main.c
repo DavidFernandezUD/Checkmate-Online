@@ -13,8 +13,7 @@ int main() {
     init_piece_attacks();
 
     Position pos;
-    parse_fen(&pos, TRICKY_POSITION);
-    pos.turn = BLACK;
+    parse_fen(&pos, KILLER_POSITION);
     print_position(pos);
 
     generate_moves(&pos);
