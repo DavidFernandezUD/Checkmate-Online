@@ -89,33 +89,6 @@ uint64_t bishop_attacks[64][512];
 uint64_t rook_attacks[64][4096];
 
 
-// TODO: Search in CPW for more efficient implementation (bitcount)
-static inline int count_bits(uint64_t bitboard) {
-    
-    int count = 0;
-
-    while (bitboard) {
-        count++;
-        bitboard &= bitboard - 1;
-    }
-
-    return count;
-}
-
-
-// TODO: Search in CPW for more efficient implementation (bitscan)
-static inline int get_ls1b_index(uint64_t bitboard) {
-    
-    if (bitboard) {
-
-        // Creates a sequence of trailing ones until the less significant bit, and count it
-        return count_bits((bitboard & -bitboard) - 1);
-    }
-    
-    return -1;
-}
-
-
 // Pawn attacks
 uint64_t get_pawn_attacks(Color color, Square square) {
 

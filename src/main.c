@@ -14,10 +14,10 @@ int main() {
 
     Position pos;
     parse_fen(&pos, TRICKY_POSITION);
-    
+    pos.turn = BLACK;
     print_position(pos);
 
-    print_attacked_squares(&pos);
+    generate_moves(&pos);
 
     return 0;
 }

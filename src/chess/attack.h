@@ -56,6 +56,7 @@ void init_bishop_attacks();
 
 void init_rook_attacks();
 
+// TODO: Define this functions here in the header file and make them static inline
 uint64_t get_bishop_attacks(int square, uint64_t occupancy);
 
 uint64_t get_rook_attacks(int square, uint64_t occupancy);

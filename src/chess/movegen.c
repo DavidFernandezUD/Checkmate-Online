@@ -44,3 +44,93 @@ void print_attacked_squares(Position* position) {
     }
     printf("\n    a b c d e f g h\n\n");
 }
+
+
+// TODO: Split each piece move generation into separate static inline functions
+void generate_moves(Position* position) {
+    
+    int src_square, dest_square;
+    uint64_t bitboard, attacks;
+
+    for (int piece = P; piece <= k; piece++) {
+        
+        bitboard = position->bitboards[piece];
+
+        // Pawn and kastling moves
+        if (position->turn == WHITE) {
+            if (piece == P) {
+                while (bitboard) {
+
+                    src_square = get_ls1b_index(bitboard);
+
+                    dest_square = src_square - 8;
+                    
+                    if ((dest_square >= a8) && !GET_BIT(position->occupancies[BOTH], dest_square)) {
+                        
+                        // Pawn promotion
+                        if (dest_square <= h8) {
+                            printf("Promotion N: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                            printf("Promotion B: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                            printf("Promotion R: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                            printf("Promotion Q: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                        } else {
+                            // 2 square moves
+                            if (src_square >= a2 && src_square <= h2  && !GET_BIT(position->occupancies[BOTH], src_square - 16)) {
+                                printf("2 square: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square - 8]);
+                            }
+
+                            // 1 square moves
+                            printf("1 square: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                        }
+                    }
+
+                    POP_BIT(bitboard, src_square);
+                }
+            } else if (piece == K) {
+
+            }
+        } else {
+                if (piece == p) {
+                while (bitboard) {
+
+                    src_square = get_ls1b_index(bitboard);
+
+                    dest_square = src_square + 8;
+                    
+                    if ((dest_square <= h1) && !GET_BIT(position->occupancies[BOTH], dest_square)) {
+                        
+                        // Pawn promotion
+                        if (dest_square >= a1) {
+                            printf("Promotion N: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                            printf("Promotion B: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                            printf("Promotion R: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                            printf("Promotion Q: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                        } else {
+                            // 2 square moves
+                            if (src_square >= a7 && src_square <= h7  && !GET_BIT(position->occupancies[BOTH], src_square + 16)) {
+                                printf("2 square: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square + 8]);
+                            }
+
+                            // 1 square moves
+                            printf("1 square: %s%s\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                        }
+                    }
+
+                    POP_BIT(bitboard, src_square);
+                }
+            } else if (piece == k) {
+
+            }
+        }
+
+        // Knight moves
+
+        // Bishop moves
+
+        // Rook moves
+
+        // Queen moves
+
+        // King moves
+    }
+}
