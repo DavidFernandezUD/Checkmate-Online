@@ -93,7 +93,7 @@ void print_position(Position position) {
                                       (position.castling & BK) ? 'k' : '-',
                                       (position.castling & BQ) ? 'q' : '-'
     );
-    printf("Enpassant: %s\n\n", (position.enpassant != null_square) ? square_to_coordinates[position.enpassant] : "no");
+    printf("Enpassant: %s\n\n", (position.enpassant != NULL_SQUARE) ? square_to_coordinates[position.enpassant] : "no");
 }
 
 
@@ -103,7 +103,7 @@ void parse_fen(Position* position, char* fen) {
     memset(position->occupancies, 0ULL, sizeof(position->occupancies));
 
     position->turn = WHITE;
-    position->enpassant = null_square;
+    position->enpassant = NULL_SQUARE;
     position->castling = 0;
 
     for (int row = 0; row < 8; row++) {

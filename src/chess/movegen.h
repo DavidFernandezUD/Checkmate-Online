@@ -8,7 +8,7 @@
 
 // Attacks
 // TODO: Define thsi function here in the header file and make it static inline
-bool is_square_attacked(Position* position, Square square);
+bool is_square_attacked(Position* position, Square square, Color color);
 
 void print_attacked_squares(Position* Position);
 
