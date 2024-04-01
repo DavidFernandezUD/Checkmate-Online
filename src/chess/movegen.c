@@ -180,7 +180,7 @@ static inline void generate_pawn_moves(Position* position) {
 }
 
 
-static inline void generate_king_moves(Position* position) {
+static inline void generate_castling_moves(Position* position) {
 
     if (position->turn == WHITE) {
 
@@ -199,10 +199,6 @@ static inline void generate_king_moves(Position* position) {
                 }
             }
         }
-
-        // Attacks
-        // TODO: Inplement this
-
     } else {
 
         // Castling
@@ -224,156 +220,53 @@ static inline void generate_king_moves(Position* position) {
 }
 
 
-// TODO: Refactor normal move generation inside generate_moves() to avoid code repetition
-static inline void generate_knight_moves(Position* position) {
-
-    int src_square;
-    int dest_square;
-    uint64_t bitboard;
-    uint64_t attacks;
-
-    bitboard = (position->turn == WHITE) ? position->bitboards[N] : position->bitboards[n];
-    while (bitboard) {
-
-        src_square = get_ls1b_index(bitboard);
-
-        attacks = knight_attacks[src_square] & ~position->occupancies[position->turn];
-
-        while (attacks) {
-            
-            dest_square = get_ls1b_index(attacks);
-
-            // Quiet move
-            if (!GET_BIT(position->occupancies[!position->turn], dest_square)) {
-                printf("%s%s Knight move\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
-            } 
-            // Capture
-            else {
-                printf("%s%s Knight capture\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
-            }
-            POP_BIT(attacks, dest_square);
-        }
-        POP_BIT(bitboard, src_square);
-    }
-}
-
-
-static inline void generate_bishop_moves(Position* position) {
-
-    int src_square;
-    int dest_square;
-    uint64_t bitboard;
-    uint64_t attacks;
-
-    bitboard = (position->turn == WHITE) ? position->bitboards[B] : position->bitboards[b];
-    while (bitboard) {
-
-        src_square = get_ls1b_index(bitboard);
-
-        attacks = get_bishop_attacks(src_square, position->occupancies[BOTH]) & ~position->occupancies[position->turn];
-
-        while (attacks) {
-            
-            dest_square = get_ls1b_index(attacks);
-
-            // Quiet move
-            if (!GET_BIT(position->occupancies[!position->turn], dest_square)) {
-                printf("%s%s Bishop move\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
-            } 
-            // Capture
-            else {
-                printf("%s%s Bishop capture\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
-            }
-            POP_BIT(attacks, dest_square);
-        }
-        POP_BIT(bitboard, src_square);
-    }
-}
-
-
-static inline void generate_rook_moves(Position* position) {
-
-    int src_square;
-    int dest_square;
-    uint64_t bitboard;
-    uint64_t attacks;
-
-    bitboard = (position->turn == WHITE) ? position->bitboards[R] : position->bitboards[r];
-    while (bitboard) {
-
-        src_square = get_ls1b_index(bitboard);
-
-        attacks = get_rook_attacks(src_square, position->occupancies[BOTH]) & ~position->occupancies[position->turn];
-
-        while (attacks) {
-            
-            dest_square = get_ls1b_index(attacks);
-
-            // Quiet move
-            if (!GET_BIT(position->occupancies[!position->turn], dest_square)) {
-                printf("%s%s Rook move\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
-            } 
-            // Capture
-            else {
-                printf("%s%s Rook capture\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
-            }
-            POP_BIT(attacks, dest_square);
-        }
-        POP_BIT(bitboard, src_square);
-    }
-}
-
-
-static inline void generate_queen_moves(Position* position) {
-
-    int src_square;
-    int dest_square;
-    uint64_t bitboard;
-    uint64_t attacks;
-
-    bitboard = (position->turn == WHITE) ? position->bitboards[Q] : position->bitboards[q];
-    while (bitboard) {
-
-        src_square = get_ls1b_index(bitboard);
-
-        attacks = get_queen_attacks(src_square, position->occupancies[BOTH]) & ~position->occupancies[position->turn];
-
-        while (attacks) {
-            
-            dest_square = get_ls1b_index(attacks);
-
-            // Quiet move
-            if (!GET_BIT(position->occupancies[!position->turn], dest_square)) {
-                printf("%s%s Queen move\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
-            } 
-            // Capture
-            else {
-                printf("%s%s Queen capture\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
-            }
-            POP_BIT(attacks, dest_square);
-        }
-        POP_BIT(bitboard, src_square);
-    }
-}
-
-
 void generate_moves(Position* position) {
 
-    // Pawn moves
-    // generate_pawn_moves(position);
+    // NOTE: Pawn moves and castling moves are calculated separately
+    generate_pawn_moves(position);
+    generate_castling_moves(position);
 
-    // Knight moves
-    // generate_knight_moves(position);
+    int start_piece = (position->turn == WHITE) ? N : n;
+    int end_piece = (position->turn == WHITE) ? K : k;
+    for (int piece = start_piece; piece <= end_piece; piece++) {
 
-    // Bishop moves
-    // generate_bishop_moves(position);
+        int src_square;
+        int dest_square;
+        uint64_t bitboard;
+        uint64_t attacks;
 
-    // Rook moves
-    // generate_rook_moves(position);
+        bitboard = position->bitboards[piece];
+        while (bitboard) {
 
-    // Queen moves
-    // generate_queen_moves(position);
+            src_square = get_ls1b_index(bitboard);
 
-    // King moves
-    // generate_king_moves(position);
+            if (piece == N || piece == n) {
+                attacks = knight_attacks[src_square] & ~position->occupancies[position->turn];
+            } else if (piece == B || piece == b) {
+                attacks = get_bishop_attacks(src_square, position->occupancies[BOTH]) & ~position->occupancies[position->turn];
+            } else if (piece == R || piece == r) {
+                attacks = get_rook_attacks(src_square, position->occupancies[BOTH]) & ~position->occupancies[position->turn];
+            } else if (piece == Q || piece == q) {
+                attacks = get_queen_attacks(src_square, position->occupancies[BOTH]) & ~position->occupancies[position->turn];
+            } else if (piece == K || piece == k) {
+                attacks = king_attacks[src_square] & ~position->occupancies[position->turn];
+            }
+
+            while (attacks) {
+                
+                dest_square = get_ls1b_index(attacks);
+
+                // Quiet move
+                if (!GET_BIT(position->occupancies[!position->turn], dest_square)) {
+                    printf("%s%s Move\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                } 
+                // Capture
+                else {
+                    printf("%s%s Capture\n", square_to_coordinates[src_square], square_to_coordinates[dest_square]);
+                }
+                POP_BIT(attacks, dest_square);
+            }
+            POP_BIT(bitboard, src_square);
+        }
+    }
 }
