@@ -13,8 +13,7 @@ int main() {
     init_piece_attacks();
 
     Position pos;
-    parse_fen(&pos, "r2nkn1r/pR1pqpR1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBRPrP/R3K2R w KQkq - 0 1 ");
-    pos.turn = BLACK;
+    parse_fen(&pos, "r3k2r/pR1pqpR1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBRPrP/R3K2R b KQkq - 0 1 ");
     print_position(pos);
 
     generate_moves(&pos);
