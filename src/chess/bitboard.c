@@ -23,10 +23,6 @@ const Piece CHAR_TO_PIECE[] = {
     ['k'] = k
 };
 
-// Piece character representations
-const char ASCII_PIECES[12] = "PNBRQKpnbrqk";
-const char* UNICODE_PIECES[12] = {"♟︎", "♞", "♝", "♜", "♛", "♚", "♙", "♘", "♗", "♖", "♕", "♔"};
-
 
 void print_bitboard(uint64_t bitboard) {
     

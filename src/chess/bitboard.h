@@ -41,6 +41,10 @@ static const char* square_to_coordinates[] = {
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
 };
 
+// Piece character representations
+static const char ASCII_PIECES[12] = "PNBRQKpnbrqk";
+static const char* UNICODE_PIECES[12] = {"♟︎", "♞", "♝", "♜", "♛", "♚", "♙", "♘", "♗", "♖", "♕", "♔"};
+
 typedef enum {WHITE, BLACK, BOTH} Color;
 
 typedef enum {P, N, B, R, Q, K, p, n, b, r, q, k} Piece;
