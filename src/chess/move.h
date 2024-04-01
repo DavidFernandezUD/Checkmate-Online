@@ -4,6 +4,7 @@
 
 
 /* ====================== MOVE REPRESENTATION ======================
+
                 BINARY                HEX             MOVE
 
     0000 0000 0000 0000 0011 1111   0x3f        source square
