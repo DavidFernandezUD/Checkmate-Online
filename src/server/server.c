@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "server.h"
 
 #define MAX_USERNAME_LEN 50
@@ -15,7 +16,7 @@ int checkCredentials(const char *username, const char *password) {
     char *passwordL;
     
     // Open the config file
-    FILE *file = fopen("src/server/serverconfig.txt", "r");
+    FILE *file = fopen("config/serverconfig.txt", "r");
 
     // Check if the file exists
     if (file == NULL) {
@@ -47,13 +48,22 @@ void requestCredentials() {
 
     // Request the username
     printf("Please, enter your username: ");
-    fgets(username, MAX_USERNAME_LEN, stdin);
-    username[strcspn(username, "\n")] = 0; // Remove the line break from the username
+    if (fgets(username, MAX_USERNAME_LEN, stdin) != NULL) {
+        username[strcspn(username, "\n")] = 0; // Remove the line break from the username
+    } else {
+        fprintf(stderr, "Error reading user input\n");
+        exit(1);
+    }
+    
 
     // Request the password
     printf("Please, enter your password: ");
-    fgets(password, MAX_PASSWORD_LEN, stdin);
-    password[strcspn(password, "\n")] = 0; // Remove the line break from the password
+    if (fgets(password, MAX_PASSWORD_LEN, stdin)) {
+        password[strcspn(password, "\n")] = 0; // Remove the line break from the password
+    } else {
+        fprintf(stderr, "Error reading user input\n");
+        exit(1);
+    }
 
     // Accept access in case of correct username and password and vice versa
     if (checkCredentials(username, password)) {

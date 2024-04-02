@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -std=c99 -Ofast -Wno-unused
-# CFLAGS_WIN = -std=c99 -Ofast
+
 
 # Platform-specific settings
 ifeq ($(OS),Windows_NT)
@@ -12,22 +12,29 @@ else
     CFLAGS += -DLINUX
 endif
 
+
 # Directories
 SRC_DIR = src
 BIN_DIR = bin
 
-# Targets
-all: chess
 
+# Targets
+all: chess server
+
+
+# Chess
 chess: $(BIN_DIR)/chess
 
 $(BIN_DIR)/chess: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
 	$(CC) $(CFLAGS) $^ -lm -o $@
 
+
+# Server
 server: $(BIN_DIR)/server
 
 $(BIN_DIR)/server: $(SRC_DIR)/server/server.c $(wildcard $(SRC_DIR)/server/*.c)
 	$(CC) $(CFLAGS) $^ -lm -o $@
+
 
 # Clean
 clean:
