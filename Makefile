@@ -1,6 +1,16 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -std=c99 -Ofast -Wno-unused
+# CFLAGS_WIN = -std=c99 -Ofast
+
+# Platform-specific settings
+ifeq ($(OS),Windows_NT)
+    # Windows specific settings
+    CFLAGS += -DWINDOWS
+else
+    # Linux specific settings
+    CFLAGS += -DLINUX
+endif
 
 # Directories
 SRC_DIR = src
