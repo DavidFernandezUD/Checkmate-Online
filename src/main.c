@@ -22,7 +22,7 @@ int main() {
     // print_position(pos);
 
     generate_moves(&pos, &list);
-    // print_move_list(&list);
+    print_move_list(&list);
 
     for (int i = 0; i < list.top; i++) {
         make_move(&pos, list.moves[i], ALL_MOVES);
