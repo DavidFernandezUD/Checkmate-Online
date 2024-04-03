@@ -8,7 +8,10 @@
 #define MAX_PASSWORD_LEN 50
 #define MAX_CREDENTIALS_LENGTH 100
 
-// Request and check admin credentials in the console
-void requestCredentials();
+// Request admin credentials in the console
+void requestCredentials(int* credentialsValid);
+
+// Show options in the menu
+void show_menu();
 
 #endif // _SERVER_H

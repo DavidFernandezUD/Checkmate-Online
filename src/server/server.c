@@ -39,7 +39,7 @@ int checkCredentials(const char *username, const char *password) {
 }
 
 // Request admin credentials in the console
-void requestCredentials() {
+void requestCredentials(int* credentialsValid) {
     char username[MAX_USERNAME_LEN];
     char password[MAX_PASSWORD_LEN];
 
@@ -65,7 +65,17 @@ void requestCredentials() {
     // Accept access in case of correct admin username and password and vice versa
     if (checkCredentials(username, password)) {
         printf("Valid credentials. Access granted.\n");
+        *credentialsValid = 1;
     } else {
         printf("Invalid credentials. Access denied.\n");
+        *credentialsValid = 0;
     }
+}
+
+// Show options in the menu
+void show_menu() {
+    printf("Press:\n");
+    printf("u -> see users\n");
+    printf("m -> see matches\n");
+    printf("q -> quit\n");
 }
