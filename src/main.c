@@ -18,16 +18,23 @@ int main() {
     Position pos;
     MoveList list;
 
-    parse_fen(&pos, TRICKY_POSITION);
-    pos.turn = BLACK;
-    // print_position(pos);
+    parse_fen(&pos, "r3k2r/p1ppQpb1/bn2pnp1/2BPN2b/1p2P3/2N13p/PPPBqPPP/R3K2R w KQkq - 0 1 ");
+    print_position(pos);
 
     generate_moves(&pos, &list);
     print_move_list(&list);
 
     for (int i = 0; i < list.top; i++) {
-        make_move(&pos, list.moves[i], ALL_MOVES);
+
+        // Preserve board state befor move
+        Position position_copy = pos;
+
+        int legal = make_move(&pos, list.moves[i], ALL_MOVES);
+        print_move(list.moves[i]);
+        printf("%s\n", (legal) ? "legal" : "ilegal");
         getchar();
+
+        pos = position_copy;
     }
 
     return 0;

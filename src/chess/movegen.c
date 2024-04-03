@@ -6,9 +6,9 @@
 
 
 // TODO: Check if changing statement order improves engine performance
-bool is_square_attacked(Position* position, Square square, Color color) {
+bool is_square_attacked(Position* position, Square square, Color attacker_color) {
 
-    if (color == WHITE) {
+    if (attacker_color == WHITE) {
         if (pawn_attacks[BLACK][square] & position->bitboards[P]) return true;                              // White Pawns
         if (knight_attacks[square] & position->bitboards[N]) return true;                                   // White Knights
         if (get_bishop_attacks(square, position->occupancies[BOTH]) & position->bitboards[B]) return true;  // White Bishops
@@ -20,7 +20,7 @@ bool is_square_attacked(Position* position, Square square, Color color) {
         if (knight_attacks[square] & position->bitboards[n]) return true;                                   // Black Knights
         if (get_bishop_attacks(square, position->occupancies[BOTH]) & position->bitboards[b]) return true;  // Black Bishops
         if (get_rook_attacks(square, position->occupancies[BOTH]) & position->bitboards[r]) return true;    // Black Rooks
-        if (get_queen_attacks(square, position->occupancies[BOTH]) & position->bitboards[Q]) return true;   // Black Queens
+        if (get_queen_attacks(square, position->occupancies[BOTH]) & position->bitboards[q]) return true;   // Black Queens
         if (king_attacks[square] & position->bitboards[k]) return true;                                     // Black King
     }
 
