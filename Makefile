@@ -29,7 +29,7 @@ $(BIN_DIR)/chess: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
 server: $(BIN_DIR)/server
 
 $(BIN_DIR)/server: $(SRC_DIR)/server/server_main.c $(wildcard $(SRC_DIR)/server/*.c) $(LIB_DIR)/sqlite/sqlite3.o
-	$(CC) $(CFLAGS) $^ -lm -o $@
+	$(CC) $^ -lm -o $@
 
 # Compile SQLite object file
 $(LIB_DIR)/sqlite/sqlite3.o: $(wildcard $(LIB_DIR)/sqlite/sqlite3.c)
