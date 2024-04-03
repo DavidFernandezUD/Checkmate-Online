@@ -28,10 +28,10 @@ int main() {
 
         switch (choice) {
             case 'u':
-                printf("See users\n");
+                show_users(db);
                 break;
             case 'm':
-                printf("Show matches\n");
+                show_matches(db);
                 break;
             case 'q':
                 printf("Quit\n");

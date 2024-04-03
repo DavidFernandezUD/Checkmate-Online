@@ -7,7 +7,7 @@
 
 // Check if itroduced admin credentials are correct
 int checkCredentials(const char *username, const char *password) {
-    char line[MAX_CREDENTIALS_LENGTH];
+    char line[MAX_A_CREDENTIALS_LENGTH];
     char *usernameL;
     char *passwordL;
     
@@ -21,7 +21,7 @@ int checkCredentials(const char *username, const char *password) {
     }
 
     // Check if the admin credentials coincide with the ones in the config file
-    while (fgets(line, MAX_CREDENTIALS_LENGTH, file) != NULL) {
+    while (fgets(line, MAX_A_CREDENTIALS_LENGTH, file) != NULL) {
         usernameL = strtok(line, ":");
         passwordL = strtok(NULL, ":");
 
@@ -40,12 +40,12 @@ int checkCredentials(const char *username, const char *password) {
 
 // Request admin credentials in the console
 void requestCredentials(int* credentialsValid) {
-    char username[MAX_USERNAME_LEN];
-    char password[MAX_PASSWORD_LEN];
+    char username[MAX_A_USERNAME_LEN];
+    char password[MAX_A_PASSWORD_LEN];
 
     // Request the admin username
     printf("Please, enter your username: ");
-    if (fgets(username, MAX_USERNAME_LEN, stdin) != NULL) {
+    if (fgets(username, MAX_A_USERNAME_LEN, stdin) != NULL) {
         username[strcspn(username, "\n")] = 0; // Remove the line break from the admin username
     } else {
         fprintf(stderr, "Error reading user input\n");
@@ -55,7 +55,7 @@ void requestCredentials(int* credentialsValid) {
 
     // Request the admin password
     printf("Please, enter your password: ");
-    if (fgets(password, MAX_PASSWORD_LEN, stdin)) {
+    if (fgets(password, MAX_A_PASSWORD_LEN, stdin)) {
         password[strcspn(password, "\n")] = 0; // Remove the line break from the admin password
     } else {
         fprintf(stderr, "Error reading user input\n");
