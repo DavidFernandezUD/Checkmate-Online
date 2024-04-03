@@ -3,35 +3,31 @@
 #include <stdlib.h>
 #include "server.h"
 
-#define MAX_USERNAME_LEN 50
-#define MAX_PASSWORD_LEN 50
-#define MAX_CREDENTIALS_LENGTH 100
-
-// TODO: Read config file without "string.h" [DAVID: ¿Por que? ¿Esta mal con string.h?]
 // TODO: Improve config file
 
+// Check if itroduced admin credentials are correct
 int checkCredentials(const char *username, const char *password) {
     char line[MAX_CREDENTIALS_LENGTH];
     char *usernameL;
     char *passwordL;
     
-    // Open the config file
+    // Open the admin config file
     FILE *file = fopen("config/serverconfig.txt", "r");
 
-    // Check if the file exists
+    // Check if the admin config file
     if (file == NULL) {
         printf("Error opening the config file.\n");
         return 0;
     }
 
-    // Check if the credentials coincide with the ones in the config file
+    // Check if the admin credentials coincide with the ones in the config file
     while (fgets(line, MAX_CREDENTIALS_LENGTH, file) != NULL) {
         usernameL = strtok(line, ":");
         passwordL = strtok(NULL, ":");
 
-        passwordL[strcspn(passwordL, "\n")] = 0; // Remove the line break from the password
+        passwordL[strcspn(passwordL, "\n")] = 0; // Remove the line break from the admin password
 
-        // Compare the introduced username and password with the ones in the config file
+        // Compare the introduced admin username and password with the ones in the config file
         if (strcmp(usernameL, username) == 0 && strcmp(passwordL, password) == 0) {
             fclose(file);
             return 1;
@@ -42,39 +38,34 @@ int checkCredentials(const char *username, const char *password) {
     return 0;
 }
 
+// Request admin credentials in the console
 void requestCredentials() {
     char username[MAX_USERNAME_LEN];
     char password[MAX_PASSWORD_LEN];
 
-    // Request the username
+    // Request the admin username
     printf("Please, enter your username: ");
     if (fgets(username, MAX_USERNAME_LEN, stdin) != NULL) {
-        username[strcspn(username, "\n")] = 0; // Remove the line break from the username
+        username[strcspn(username, "\n")] = 0; // Remove the line break from the admin username
     } else {
         fprintf(stderr, "Error reading user input\n");
         exit(1);
     }
     
 
-    // Request the password
+    // Request the admin password
     printf("Please, enter your password: ");
     if (fgets(password, MAX_PASSWORD_LEN, stdin)) {
-        password[strcspn(password, "\n")] = 0; // Remove the line break from the password
+        password[strcspn(password, "\n")] = 0; // Remove the line break from the admin password
     } else {
         fprintf(stderr, "Error reading user input\n");
         exit(1);
     }
 
-    // Accept access in case of correct username and password and vice versa
+    // Accept access in case of correct admin username and password and vice versa
     if (checkCredentials(username, password)) {
         printf("Valid credentials. Access granted.\n");
     } else {
         printf("Invalid credentials. Access denied.\n");
     }
-}
-
-int main() {
-    requestCredentials();
-
-    return 0;
 }
