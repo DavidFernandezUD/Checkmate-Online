@@ -24,3 +24,5 @@ bin/
 *~
 *.swp
 
+# Database files
+*.db

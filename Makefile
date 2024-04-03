@@ -17,7 +17,8 @@ endif
 SRC_DIR = src
 BIN_DIR = bin
 LIB_DIR = lib
-SQLITE_DIR = $(LIB_DIR)/sqlite
+
+SQLITE_LIB = $(LIB_DIR)/sqlite/sqlite3.c
 
 
 # Targets
@@ -34,8 +35,8 @@ $(BIN_DIR)/chess: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
 # Server
 server: $(BIN_DIR)/server
 
-$(BIN_DIR)/server: $(SRC_DIR)/server/serverMain.c $(wildcard $(SRC_DIR)/server/*.c)
-	$(CC) $(CFLAGS) $^ -lm -o $@ -I$(SQLITE_DIR)
+$(BIN_DIR)/server: $(SRC_DIR)/server/serverMain.c $(wildcard $(SRC_DIR)/server/*.c) $(SQLITE_LIB)
+	$(CC) $^ -lm -o $@
 
 
 # Clean
