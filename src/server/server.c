@@ -7,7 +7,7 @@
 #define MAX_PASSWORD_LEN 50
 #define MAX_CREDENTIALS_LENGTH 100
 
-// TODO: Read config file without "string.h"
+// TODO: Read config file without "string.h" [DAVID: ¿Por que? ¿Esta mal con string.h?]
 // TODO: Improve config file
 
 int checkCredentials(const char *username, const char *password) {
