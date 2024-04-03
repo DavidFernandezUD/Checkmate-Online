@@ -8,10 +8,7 @@
 #define MAX_PASSWORD_LEN 50
 #define MAX_CREDENTIALS_LENGTH 100
 
-// Check if itroduced admin credentials are correct
-int check_credentials(const char* username, const char* password);
-
-// Request admin credentials in the console
+// Request and check admin credentials in the console
 void requestCredentials();
 
 #endif // _SERVER_H
