@@ -22,25 +22,10 @@ int main() {
 
     // Main menu
     do {
-        show_menu();
+        show_main_menu();
         printf("Choose an option: ");
         scanf(" %c", &choice); // Read user's choice
-
-        switch (choice) {
-            case 'u':
-                show_users(db);
-                break;
-            case 'm':
-                show_matches(db);
-                break;
-            case 'q':
-                printf("Quit\n");
-                break;
-            default:
-                printf("Not a valid option\n");
-                break;
-        }
-
+        handle_main_menu_option(db, choice);
     } while (choice != 'q');
 
     // Close database

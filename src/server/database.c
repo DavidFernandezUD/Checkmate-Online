@@ -1,21 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../../lib/sqlite/sqlite3.h"
+
 #include "database.h"
 
-// Just to test the "load_players" function
-Player players[] = {
-    {"Player1", "password1", 1500, "2024-04-04", 0.6, 0.5, 0.7},
-    {"Player2", "password2", 1600, "2024-04-04", 0.7, 0.6, 0.8},
-    {"Player3", "password3", 1700, "2024-04-04", 0.8, 0.7, 0.9}
+// Just to test the "load_users" function
+User users[] = {
+    {"User1", "password1", 1500, "2024-04-04", 0.6, 0.5, 0.7},
+    {"User2", "password2", 1600, "2024-04-04", 0.7, 0.6, 0.8},
+    {"User3", "password3", 1700, "2024-04-04", 0.8, 0.7, 0.9}
 };
-int n_players = sizeof(players) / sizeof(players[0]); // Calculate the size of "players"
+int n_users = sizeof(users) / sizeof(users[0]); // Calculate the size of "users"
 
-// Function to add players to the database
-int load_players(sqlite3* db, Player* players, int n_players) {
-    for (int i = 0; i < n_players; i++) {
+// Function to add users to the database
+int load_users(sqlite3* db, User* users, int n_users) {
+    for (int i = 0; i < n_users; i++) {
         char select_query[512];
-        sprintf(select_query, "SELECT COUNT(*) FROM PLAYERS WHERE username='%s';", players[i].username);
+        sprintf(select_query, "SELECT COUNT(*) FROM USERS WHERE username='%s';", users[i].username);
 
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
@@ -34,27 +36,26 @@ int load_players(sqlite3* db, Player* players, int n_players) {
 
         // If the user already exists, go to the next one
         if (count > 0) {
-            printf("The user %s already exists in the database.\n", players[i].username);
+            printf("The user %s already exists in the database.\n", users[i].username);
             continue;
         }
 
         // Insert the user in the database
         char insert_query[512];
-        sprintf(insert_query, "INSERT INTO PLAYERS (username, password, ELO, creation_date, winrate, winrate_white, winrate_black) "
+        sprintf(insert_query, "INSERT INTO USERS (username, password, ELO, creation_date, winrate, winrate_white, winrate_black) "
                               "VALUES ('%s', '%s', %d, '%s', %f, %f, %f);",
-                              players[i].username, players[i].password, players[i].ELO, players[i].creation_date,
-                              players[i].winrate, players[i].winrate_white, players[i].winrate_black);
+                              users[i].username, users[i].password, users[i].ELO, users[i].creation_date,
+                              users[i].winrate, users[i].winrate_white, users[i].winrate_black);
 
         // Execute the insertion query
         rc = sqlite3_exec(db, insert_query, 0, 0, 0);
         if (rc != SQLITE_OK) {
-            fprintf(stderr, "Error inserting data into PLAYERS table: %s\n", sqlite3_errmsg(db));
+            fprintf(stderr, "Error inserting data into USERS table: %s\n", sqlite3_errmsg(db));
             return 1;
         }
     }
     return 0;
 }
-
 
 // Just to test the "load_matches" function
 Match matches[] = {
@@ -68,8 +69,8 @@ int n_matches = sizeof(matches) / sizeof(matches[0]);
 int load_matches(sqlite3* db, Match* matches, int n_matches) {
     for (int i = 0; i < n_matches; i++) {
         char select_query[512];
-        sprintf(select_query, "SELECT COUNT(*) FROM MATCHES WHERE date='%s' AND black_player_id=%d AND white_player_id=%d;",
-                matches[i].date, matches[i].black_player_id, matches[i].white_player_id);
+        sprintf(select_query, "SELECT COUNT(*) FROM MATCHES WHERE date='%s' AND black_user_id=%d AND white_user_id=%d;",
+                matches[i].date, matches[i].black_user_id, matches[i].white_user_id);
 
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
@@ -94,9 +95,9 @@ int load_matches(sqlite3* db, Match* matches, int n_matches) {
 
         // Insert the user in the database
         char insert_query[512];
-        sprintf(insert_query, "INSERT INTO MATCHES (date, black_player_id, white_player_id, match_type) "
+        sprintf(insert_query, "INSERT INTO MATCHES (date, black_user_id, white_user_id, match_type) "
                               "VALUES ('%s', %d, %d, '%s');",
-                              matches[i].date, matches[i].black_player_id, matches[i].white_player_id, matches[i].match_type);
+                              matches[i].date, matches[i].black_user_id, matches[i].white_user_id, matches[i].match_type);
 
         // Execute the insertion query
         rc = sqlite3_exec(db, insert_query, 0, 0, 0);
@@ -109,7 +110,6 @@ int load_matches(sqlite3* db, Match* matches, int n_matches) {
     return 0;
 }
 
-
 // Open or create database
 int initialize_db(sqlite3** db) {
     int rc = sqlite3_open("database.db", db);
@@ -120,9 +120,9 @@ int initialize_db(sqlite3** db) {
     }
 
     // Create table USERS
-    const char* create_players_table = 
-        "CREATE TABLE IF NOT EXISTS PLAYERS ("
-        "player_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    const char* create_users_table = 
+        "CREATE TABLE IF NOT EXISTS USERS ("
+        "user_id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "username TEXT NOT NULL,"
         "password TEXT NOT NULL,"
         "ELO INTEGER,"
@@ -137,11 +137,11 @@ int initialize_db(sqlite3** db) {
         "CREATE TABLE IF NOT EXISTS MATCHES ("
         "match_id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "date TEXT,"
-        "black_player_id INTEGER,"
-        "white_player_id INTEGER,"
+        "black_user_id INTEGER,"
+        "white_user_id INTEGER,"
         "match_type TEXT,"
-        "FOREIGN KEY (black_player_id) REFERENCES JUGADORES (player_id),"
-        "FOREIGN KEY (white_player_id) REFERENCES JUGADORES (player_id)"
+        "FOREIGN KEY (black_user_id) REFERENCES JUGADORES (user_id),"
+        "FOREIGN KEY (white_user_id) REFERENCES JUGADORES (user_id)"
         ");";
 
     // Create table MOVEMENTS
@@ -163,21 +163,21 @@ int initialize_db(sqlite3** db) {
         "chat TEXT,"
         "match_id INTEGER,"
         "chat_time TEXT,"
-        "sender_player_id INTEGER,"
-        "receiver_player_id INTEGER,"
+        "sender_user_id INTEGER,"
+        "receiver_user_id INTEGER,"
         "FOREIGN KEY (match_id) REFERENCES PARTIDAS (match_id),"
-        "FOREIGN KEY (sender_player_id) REFERENCES JUGADORES (player_id),"
-        "FOREIGN KEY (receiver_player_id) REFERENCES JUGADORES (player_id)"
+        "FOREIGN KEY (sender_user_id) REFERENCES JUGADORES (user_id),"
+        "FOREIGN KEY (receiver_user_id) REFERENCES JUGADORES (user_id)"
         ");";
 
-    // Ejecutar consultas de creación de tablas
-    // PLAYERS TABLE
-    rc = sqlite3_exec(*db, create_players_table, 0, 0, 0);
+    // Execute table creation queries
+    // USERS TABLE
+    rc = sqlite3_exec(*db, create_users_table, 0, 0, 0);
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "Error creating table PLAYERS: %s\n", sqlite3_errmsg(*db));
+        fprintf(stderr, "Error creating table USERS: %s\n", sqlite3_errmsg(*db));
         return 1;
     }
-    load_players(*db, players, n_players);
+    load_users(*db, users, n_users);
     // MATCHES TABLE
     rc = sqlite3_exec(*db, create_matches_table, 0, 0, 0);
     if (rc != SQLITE_OK) {
@@ -207,7 +207,7 @@ void close_database(sqlite3* db) {
 
 // Show in the console every user in the database
 void show_users(sqlite3* db) {
-    const char* select_query = "SELECT * FROM PLAYERS;";
+    const char* select_query = "SELECT * FROM USERS;";
 
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
@@ -217,18 +217,19 @@ void show_users(sqlite3* db) {
     }
 
     printf("Users registered:\n");
-    printf("ID | Username | ELO | Creation date | Winrate | Winrate (white) | Winrate (black)\n");
+    printf("ID | Username | Password | ELO | Creation date | Winrate | Winrate (white) | Winrate (black)\n");
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int player_id = sqlite3_column_int(stmt, 0);
+        int user_id = sqlite3_column_int(stmt, 0);
         const unsigned char* username = sqlite3_column_text(stmt, 1);
+        const unsigned char* password = sqlite3_column_text(stmt, 2);
         int elo = sqlite3_column_int(stmt, 3);
         const unsigned char* creation_date = sqlite3_column_text(stmt, 4);
         double winrate = sqlite3_column_double(stmt, 5);
         double winrate_white = sqlite3_column_double(stmt, 6);
         double winrate_black = sqlite3_column_double(stmt, 7);
 
-        printf("%d | %s | %d | %s | %.2f | %.2f | %.2f\n", player_id, username, elo, creation_date, winrate, winrate_white, winrate_black);
+        printf("%d | %s | %s | %d | %s | %.2f | %.2f | %.2f\n", user_id, username, password, elo, creation_date, winrate, winrate_white, winrate_black);
     }
     sqlite3_finalize(stmt);
 }
@@ -245,17 +246,59 @@ void show_matches(sqlite3* db) {
     }
 
     printf("Matches played:\n");
-    printf("ID | Date | ID white player | ID black player | Match type\n");
+    printf("ID | Date | ID white user | ID black user | Match type\n");
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         int match_id = sqlite3_column_int(stmt, 0);
         const unsigned char* date = sqlite3_column_text(stmt, 1);
-        int black_player_id = sqlite3_column_int(stmt, 2);
-        int white_player_id = sqlite3_column_int(stmt, 3);
+        int black_user_id = sqlite3_column_int(stmt, 2);
+        int white_user_id = sqlite3_column_int(stmt, 3);
         const unsigned char* match_type = sqlite3_column_text(stmt, 4);
 
-        printf("%d | %s | %d | %d | %s\n", match_id, date, black_player_id, white_player_id, match_type);
+        printf("%d | %s | %d | %d | %s\n", match_id, date, black_user_id, white_user_id, match_type);
     }
     sqlite3_finalize(stmt);
+}
+
+// Update parameters of the USERS table
+int update_user_parameter(sqlite3* db, int user_id, const char* parameter, const char* new_value) {
+    // Map of names so that SQLite understands which parameter to edit
+    const char* column_name;
+    if (strcmp(parameter, "name") == 0) {
+        column_name = "username";
+    } else if (strcmp(parameter, "password") == 0) {
+        column_name = "password";
+    } else if (strcmp(parameter, "elo") == 0) {
+        column_name = "ELO";
+    } else {
+        fprintf(stderr, "Invalid parameter: %s\n", parameter);
+        return 1;
+    }
+
+    // Build the update query
+    char update_query[512];
+    sprintf(update_query, "UPDATE USERS SET %s='%s' WHERE user_id=%d;", column_name, new_value, user_id);
+
+    // Execute the update query
+    int rc = sqlite3_exec(db, update_query, 0, 0, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Error updating user parameter in USERS table: %s\n", sqlite3_errmsg(db));
+        return 1;
+    }
+    return 0;
+}
+
+// Delete selected row from the database
+int delete_rows(sqlite3* db, const char* table, const char* condition) {
+    char delete_query[512];
+    sprintf(delete_query, "DELETE FROM %s WHERE %s;", table, condition);
+
+    // Execute the deletion query
+    int rc = sqlite3_exec(db, delete_query, 0, 0, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Error deleting rows from table %s: %s\n", table, sqlite3_errmsg(db));
+        return 1;
+    }
+    return 0;
 }
 

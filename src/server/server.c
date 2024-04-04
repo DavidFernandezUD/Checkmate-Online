@@ -1,7 +1,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../../lib/sqlite/sqlite3.h"
+
 #include "server.h"
+#include "database.h"
+
+// Useful admin username and password attributes
+#define MAX_A_USERNAME_LEN 50
+#define MAX_A_PASSWORD_LEN 50
+#define MAX_A_CREDENTIALS_LENGTH 100
+
+#define MAX_PARAMETER_LENGTH 10
+#define MAX_VALUE_LENGTH 100
 
 // TODO: Improve config file
 
@@ -72,10 +83,86 @@ void requestCredentials(int* credentialsValid) {
     }
 }
 
-// Show options in the menu
-void show_menu() {
-    printf("Press:\n");
-    printf("u -> see users\n");
-    printf("m -> see matches\n");
-    printf("q -> quit\n");
+// Ask and update parameters of the USERS table
+void update_user(sqlite3* db) {
+    printf("Enter the ID of the user you want to edit: ");
+    int user_id;
+    scanf("%d", &user_id);
+
+    printf("Which parameter do you want to edit? (name, password, elo): ");
+    char parameter[MAX_PARAMETER_LENGTH];
+    scanf("%s", parameter);
+
+    printf("Enter the new value: ");
+    char new_value[MAX_VALUE_LENGTH];
+    scanf("%s", new_value);
+
+    if (update_user_parameter(db, user_id, parameter, new_value) != 0) {
+        fprintf(stderr, "Error updating user parameter.\n");
+    }
+}
+
+// Delete selected user from the database
+void remove_user(sqlite3* db) {
+    printf("Enter the ID of the user you want to delete: ");
+    int user_id;
+    scanf("%d", &user_id);
+    char condition[50];
+    sprintf(condition, "user_id = %d", user_id);
+    if (delete_rows(db, "USERS", condition) != 0) {
+        fprintf(stderr, "Error deleting rows from the USERS table.\n");
+    }
+}
+
+// Handle user managing menu options
+void manage_users_menu(sqlite3* db) {
+    char choice;
+    do {
+        show_users(db);
+        printf("---------\n");
+        printf("e -> Edit User\n");
+        printf("r -> Remove User\n");
+        printf("b -> Go Back\n");
+        printf("Choose an option: ");
+        scanf(" %c", &choice);
+        switch (choice) {
+            case 'e':
+                update_user(db);
+                break;
+            case 'r':
+                remove_user(db);
+                break;
+            case 'b':
+                break;
+            default:
+                printf("Not a valid option\n");
+                break;
+        }
+    } while (choice != 'b');
+}
+
+// Show options in the main menu
+void show_main_menu() {
+    printf("\nMain Menu\n");
+    printf("---------\n");
+    printf("u -> Manage Users\n");
+    printf("m -> Show Matches\n");
+    printf("q -> Quit\n");
+}
+
+// Handle main menu options
+void handle_main_menu_option(sqlite3* db, char choice) {
+    switch (choice) {
+        case 'u':
+            manage_users_menu(db);
+            break;
+        case 'm':
+            show_matches(db);
+            break;
+        case 'q':
+            break;
+        default:
+            printf("Not a valid option\n");
+            break;
+    }
 }
