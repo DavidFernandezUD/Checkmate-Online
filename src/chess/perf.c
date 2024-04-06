@@ -34,15 +34,12 @@ void perft_driver(Position* pos, int depth, long* nodes) {
     generate_moves(pos, &list);
     
     for (int i = 0; i < list.top; i++) {   
-        
         Position pos_copy = *pos;
-        
-        if (!make_move(pos, list.moves[i], ALL_MOVES)) {
-            continue;
+
+        if (make_move(pos, list.moves[i], ALL_MOVES)) {
+            perft_driver(pos, depth - 1, nodes);
         }
 
-        perft_driver(pos, depth - 1, nodes);
-        
-        *pos = pos_copy;
+        *pos = pos_copy; 
     }
 }
