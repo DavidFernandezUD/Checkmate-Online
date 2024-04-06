@@ -13,36 +13,19 @@
 
 int main() {
 
-    // init_piece_attacks();
+    init_piece_attacks();
 
-    // Position pos;
-    // MoveList list;
+    Position pos;
+    long nodes = 0;
 
-    // parse_fen(&pos, "r3k2r/p1ppQpb1/bn2pnp1/2BPN2b/1p2P3/2N13p/PPPBqPPP/R3K2R w KQkq - 0 1 ");
+    parse_fen(&pos, "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
     // print_position(pos);
 
-    // generate_moves(&pos, &list);
-    // print_move_list(&list);
-
-    // for (int i = 0; i < list.top; i++) {
-
-    //     // Preserve board state befor move
-    //     Position position_copy = pos;
-
-    //     int legal = make_move(&pos, list.moves[i], ALL_MOVES);
-    //     print_move(list.moves[i]);
-    //     printf("%s\n", (legal) ? "legal" : "ilegal");
-    //     getchar();
-
-    //     pos = position_copy;
-    // }
-
-    printf("Start!\n");
     int start = get_time_ms();
-    getchar();
+    perft_driver(&pos, 1, &nodes);
     int end = get_time_ms();
 
-    printf("Time -> %dms\n", end - start);
+    printf("Time: %dms Nodes: %ld\n", end - start, nodes);
 
     return 0;
 }

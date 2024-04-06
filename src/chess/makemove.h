@@ -6,9 +6,9 @@
 #define _MAKEMOVE_H
 
 
-typedef enum {ALL_MOVES, ATTACK_MOVES} MoveType;
+typedef enum {ALL_MOVES, CAPTURE_MOVES} MoveType;
 
-const int CASTLING_RIGHTS[64] = {
+static const int CASTLING_RIGHTS[64] = {
      7, 15, 15, 15,  3, 15, 15, 11,
     15, 15, 15, 15, 15, 15, 15, 15,
     15, 15, 15, 15, 15, 15, 15, 15,
@@ -136,6 +136,10 @@ static inline int make_move(Position* position, int move, MoveType type) {
         } else {
             if (is_square_attacked(position, get_ls1b_index(position->bitboards[k]), WHITE)) return 0;
         }
+
+        // // Change turn
+        position->turn ^= 1;
+        
     } else {
         if (IS_MOVE_CAPTURE(move)) {
             make_move(position, move, ALL_MOVES);
