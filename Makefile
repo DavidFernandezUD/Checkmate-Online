@@ -19,11 +19,20 @@ LIB_DIR = lib
 # Targets
 all: chess server
 
+
 # Chess
 chess: $(BIN_DIR)/chess
 
 $(BIN_DIR)/chess: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
 	$(CC) $(CFLAGS) $^ -lm -o $@
+
+
+# Chess profiling
+chess_profile: $(BIN_DIR)/chess_profile
+
+$(BIN_DIR)/chess_profile: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
+	$(CC) $(CFLAGS) $^ -lm -pg -o $@
+
 
 # Server
 server: $(BIN_DIR)/server
@@ -34,6 +43,7 @@ $(BIN_DIR)/server: $(SRC_DIR)/server/server_main.c $(wildcard $(SRC_DIR)/server/
 # Compile SQLite object file
 $(LIB_DIR)/sqlite/sqlite3.o: $(wildcard $(LIB_DIR)/sqlite/sqlite3.c)
 	$(CC) -c $^ -o $@ -I$(LIB_DIR)/sqlite
+
 
 # Clean
 clean:

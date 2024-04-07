@@ -137,7 +137,7 @@ static inline int make_move(Position* position, int move, MoveType type) {
             if (is_square_attacked(position, get_ls1b_index(position->bitboards[k]), WHITE)) return 0;
         }
 
-        // // Change turn
+        // Change turn
         position->turn ^= 1;
         
     } else {

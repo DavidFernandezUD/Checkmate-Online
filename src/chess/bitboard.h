@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <immintrin.h>
 
 
 #ifndef _BITBOARD_H
@@ -85,30 +86,13 @@ typedef struct {
 } Position;
 
 
-// TODO: Search in CPW for more efficient implementation (bitcount)
 static inline int count_bits(uint64_t bitboard) {
-    
-    int count = 0;
-
-    while (bitboard) {
-        count++;
-        bitboard &= bitboard - 1;
-    }
-
-    return count;
+    return _popcnt64(bitboard);
 }
 
 
-// TODO: Search in CPW for more efficient implementation (bitscan)
 static inline int get_ls1b_index(uint64_t bitboard) {
-    
-    if (bitboard) {
-
-        // Creates a sequence of trailing ones until the less significant bit, and count it
-        return count_bits((bitboard & -bitboard) - 1);
-    }
-    
-    return -1;
+    return __builtin_ctzll(bitboard);
 }
 
 

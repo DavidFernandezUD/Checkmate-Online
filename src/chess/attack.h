@@ -21,6 +21,20 @@ typedef enum {ROOK, BISHOP} IsBishop;
 extern uint64_t pawn_attacks[2][64];
 extern uint64_t knight_attacks[64];
 extern uint64_t king_attacks[64];
+extern uint64_t bishop_attacks[64][512];
+extern uint64_t rook_attacks[64][4096];
+
+// Attack masks
+extern uint64_t bishop_attack_masks[64];
+extern uint64_t rook_attack_masks[64];
+
+// Magic numbers
+extern uint64_t bishop_magic_numbers[64];
+extern uint64_t rook_magic_numbers[64];
+
+// Relevant bits
+extern const int bishop_relevant_bits[64];
+extern const int rook_relevant_bits[64];
 
 
 // Leaper piece attacks
@@ -56,12 +70,39 @@ void init_bishop_attacks();
 
 void init_rook_attacks();
 
-// TODO: Define this functions here in the header file and make them static inline
-uint64_t get_bishop_attacks(int square, uint64_t occupancy);
+static inline uint64_t get_bishop_attacks(int square, uint64_t occupancy) {
 
-uint64_t get_rook_attacks(int square, uint64_t occupancy);
+    occupancy &= bishop_attack_masks[square];
+    occupancy *= bishop_magic_numbers[square];
+    occupancy >>= 64 - bishop_relevant_bits[square];
 
-uint64_t get_queen_attacks(int square, uint64_t occupancy);
+    return bishop_attacks[square][occupancy];
+}
+
+static inline uint64_t get_rook_attacks(int square, uint64_t occupancy) {
+
+    occupancy &= rook_attack_masks[square];
+    occupancy *= rook_magic_numbers[square];
+    occupancy >>= 64 - rook_relevant_bits[square];
+    
+    return rook_attacks[square][occupancy];
+}
+
+static inline uint64_t get_queen_attacks(int square, uint64_t occupancy) {
+
+    uint64_t bishop_occupancy = occupancy;
+    uint64_t rook_occupancy = occupancy;
+
+    bishop_occupancy &= bishop_attack_masks[square];
+    bishop_occupancy *= bishop_magic_numbers[square];
+    bishop_occupancy >>= 64 - bishop_relevant_bits[square];
+
+    rook_occupancy &= rook_attack_masks[square];
+    rook_occupancy *= rook_magic_numbers[square];
+    rook_occupancy >>= 64 - rook_relevant_bits[square];
+    
+    return bishop_attacks[square][bishop_occupancy] | rook_attacks[square][rook_occupancy];
+}
 
 
 // Attack table Initialization
