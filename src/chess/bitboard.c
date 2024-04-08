@@ -45,7 +45,12 @@ void print_bitboard(uint64_t bitboard) {
 
     // Print column character indexes
     printf("\n    a b c d e f g h\n\n");
-    printf("Bitboard: %llu\n\n", bitboard);
+
+    #ifdef _WIN64
+        printf("Bitboard: %llu\n\n", bitboard);
+    #else
+        printf("Bitboard: %lu\n\n", bitboard);
+    #endif
 }
 
 
