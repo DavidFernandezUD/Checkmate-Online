@@ -5,7 +5,7 @@
 
 
 void print_move(int move) {
-    #ifdef _WIN64
+    #ifdef _WIN32
         printf(
             "%s%s%c     %c      %s      %s      %s      %s\n",
             square_to_coordinates[GET_MOVE_SRC(move)], 

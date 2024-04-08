@@ -46,7 +46,7 @@ void print_bitboard(uint64_t bitboard) {
     // Print column character indexes
     printf("\n    a b c d e f g h\n\n");
 
-    #ifdef _WIN64
+    #ifdef _WIN32
         printf("Bitboard: %llu\n\n", bitboard);
     #else
         printf("Bitboard: %lu\n\n", bitboard);
@@ -76,7 +76,7 @@ void print_position(Position position) {
             }
 
             // For OS compatibility
-            #ifdef _WIN64
+            #ifdef _WIN32
                 printf(" %c", (piece == -1) ? '.' : ASCII_PIECES[piece]);
             #else
                 printf(" %s", (piece == -1) ? "." : UNICODE_PIECES[piece]);
