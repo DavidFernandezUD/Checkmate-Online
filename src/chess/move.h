@@ -28,7 +28,7 @@
 #define IS_MOVE_ENPASSANT(move) ((move) & 0x400000)
 #define IS_MOVE_CASTLE(move) ((move) & 0x800000)
 
-typedef enum {CAPTURE = 1, DOUBLE = 2, ENPASSANT = 4, CASTLING = 8} MoveFlags;
+typedef enum {CAPTURE = 1, DOUBLE_PUSH = 2, ENPASSANT = 4, CASTLING = 8} MoveFlags;
 
 
 // Move encoding

@@ -5,9 +5,9 @@
 
 
 void print_move(int move) {
-    #ifdef WIN64
+    #ifdef _WIN64
         printf(
-            "%s%s%c     %s      %s      %s      %s      %s\n",
+            "%s%s%c     %c      %s      %s      %s      %s\n",
             square_to_coordinates[GET_MOVE_SRC(move)], 
             square_to_coordinates[GET_MOVE_DEST(move)],
             GET_MOVE_PROMOTION(move) ? tolower(ASCII_PIECES[GET_MOVE_PROMOTION(move)]) : ' ',

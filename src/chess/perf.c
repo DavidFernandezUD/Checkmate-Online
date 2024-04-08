@@ -4,7 +4,7 @@
 #include "makemove.h"
 #include "perf.h"
 
-#ifdef WIN64
+#ifdef _WIN64
     #include <windows.h>
 #else
     #include <sys/time.h>
@@ -12,7 +12,7 @@
 
 
 int get_time_ms() {
-    #ifdef WIN64
+    #ifdef _WIN64
         return GetTickCount();
     #else
         struct timeval time_value;

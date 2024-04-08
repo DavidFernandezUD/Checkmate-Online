@@ -80,7 +80,7 @@ static inline void generate_pawn_moves(Position* position, MoveList* move_list) 
                     // 2 square moves
                     dest_square = src_square - 16;
                     if (src_square >= a2 && src_square <= h2  && !GET_BIT(position->occupancies[BOTH], dest_square)) {
-                        push_move(move_list, encode_move(src_square, dest_square, P, 0, DOUBLE));
+                        push_move(move_list, encode_move(src_square, dest_square, P, 0, DOUBLE_PUSH));
                     }
                 }
             }
@@ -140,7 +140,7 @@ static inline void generate_pawn_moves(Position* position, MoveList* move_list) 
                     // 2 square moves
                     dest_square = src_square + 16;
                     if (src_square >= a7 && src_square <= h7  && !GET_BIT(position->occupancies[BOTH], dest_square)) {
-                        push_move(move_list, encode_move(src_square, dest_square, p, 0, DOUBLE));
+                        push_move(move_list, encode_move(src_square, dest_square, p, 0, DOUBLE_PUSH));
                     }
                 }
             }

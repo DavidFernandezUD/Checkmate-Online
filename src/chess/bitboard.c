@@ -45,21 +45,21 @@ void print_bitboard(uint64_t bitboard) {
 
     // Print column character indexes
     printf("\n    a b c d e f g h\n\n");
-    printf("Bitboard: %lu\n\n", bitboard);
+    printf("Bitboard: %llu\n\n", bitboard);
 }
 
 
 void print_position(Position position) {
    
-    for (size_t i = 0; i < 8; i++) {
-        for (size_t j = 0; j < 8; j++) {
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
             
             // Index of current square in flattened array
             int square = i * 8 + j;
             
             // Print row index
             if (j == 0) {
-                printf(" %ld ", 8 - i);
+                printf(" %d ", 8 - i);
             }
             
             // Loop over bitboards
@@ -71,7 +71,7 @@ void print_position(Position position) {
             }
 
             // For OS compatibility
-            #ifdef WIN64
+            #ifdef _WIN64
                 printf(" %c", (piece == -1) ? '.' : ASCII_PIECES[piece]);
             #else
                 printf(" %s", (piece == -1) ? "." : UNICODE_PIECES[piece]);
