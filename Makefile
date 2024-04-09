@@ -23,7 +23,7 @@ all: chess server
 # Chess
 chess: $(BIN_DIR)/chess
 
-$(BIN_DIR)/chess: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
+$(BIN_DIR)/chess: $(wildcard $(SRC_DIR)/chess/*.c)
 	$(CC) $(CFLAGS) $^ -lm -o $@
 
 
