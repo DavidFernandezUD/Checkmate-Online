@@ -37,12 +37,8 @@ $(BIN_DIR)/chess_profile: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
 # Server
 server: $(BIN_DIR)/server
 
-$(BIN_DIR)/server: $(SRC_DIR)/server/server_main.c $(wildcard $(SRC_DIR)/server/*.c) $(LIB_DIR)/sqlite/sqlite3.o
+$(BIN_DIR)/server: $(SRC_DIR)/server/server_main.c $(wildcard $(SRC_DIR)/server/*.c) $(LIB_DIR)/sqlite/sqlite3.c
 	$(CC) $^ -lm -o $@
-
-# Compile SQLite object file
-$(LIB_DIR)/sqlite/sqlite3.o: $(wildcard $(LIB_DIR)/sqlite/sqlite3.c)
-	$(CC) -c $^ -o $@ -I$(LIB_DIR)/sqlite
 
 
 # Clean

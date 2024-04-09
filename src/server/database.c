@@ -5,6 +5,8 @@
 
 #include "database.h"
 
+// TODO add ON DELETE CASCADE to the MATCHES table
+
 // Just to test the "load_users" function
 User users[] = {
     {"User1", "password1", 1500, "2024-04-04", 0.6, 0.5, 0.7},

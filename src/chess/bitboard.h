@@ -1,5 +1,10 @@
 #include <stdint.h>
-#include <immintrin.h>
+
+#ifdef _WIN64
+    #include <intrin.h>
+#else
+    #include <immintrin.h>
+#endif
 
 
 #ifndef _BITBOARD_H
