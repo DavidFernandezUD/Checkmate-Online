@@ -232,6 +232,7 @@ void generate_moves(Position* position, MoveList* move_list) {
 
     int start_piece = (position->turn == WHITE) ? N : n;
     int end_piece = (position->turn == WHITE) ? K : k;
+    
     for (int piece = start_piece; piece <= end_piece; piece++) {
 
         int src_square;

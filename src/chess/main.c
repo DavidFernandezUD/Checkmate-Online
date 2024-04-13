@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
-#include "chess/bitboard.h"
-#include "chess/attack.h"
-#include "chess/random.h"
-#include "chess/movegen.h"
-#include "chess/move.h"
-#include "chess/makemove.h"
-#include "chess/perf.h"
+#include "bitboard.h"
+#include "attack.h"
+#include "random.h"
+#include "movegen.h"
+#include "move.h"
+#include "makemove.h"
+#include "perf.h"
 
 int main() {
 
