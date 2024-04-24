@@ -1,8 +1,7 @@
 #include <stdlib.h>
-#include <sys/time.h>
 #include "movegen.h"
 #include "makemove.h"
-#include "perf.h"
+#include "perftest.h"
 
 #ifdef _WIN32
     #include <windows.h>
@@ -22,7 +21,7 @@ int get_time_ms() {
 }
 
 
-void perft_driver(Position* pos, int depth, long* nodes) {
+void perf_test(Position* pos, int depth, long* nodes) {
     
     if (depth == 0) {
         (*nodes)++;
@@ -37,9 +36,9 @@ void perft_driver(Position* pos, int depth, long* nodes) {
         Position pos_copy = *pos;
 
         if (make_move(pos, list.moves[i], ALL_MOVES)) {
-            perft_driver(pos, depth - 1, nodes);
+            perf_test(pos, depth - 1, nodes);
         }
 
-        *pos = pos_copy; 
+        *pos = pos_copy;
     }
 }

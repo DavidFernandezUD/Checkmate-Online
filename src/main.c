@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
-#include "bitboard.h"
-#include "attack.h"
-#include "random.h"
-#include "movegen.h"
-#include "move.h"
-#include "makemove.h"
-#include "perf.h"
+#include "chess/bitboard.h"
+#include "chess/attack.h"
+#include "chess/random.h"
+#include "chess/movegen.h"
+#include "chess/move.h"
+#include "chess/makemove.h"
+#include "chess/perftest.h"
 
 int main() {
 
@@ -22,7 +22,7 @@ int main() {
     print_position(pos);
 
     int start = get_time_ms();
-    perft_driver(&pos, 6, &nodes);
+    perf_test(&pos, 6, &nodes);
     int end = get_time_ms();
 
     printf("Time: %dms Nodes: %ld\n", end - start, nodes);

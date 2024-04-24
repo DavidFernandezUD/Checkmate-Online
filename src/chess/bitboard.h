@@ -91,6 +91,7 @@ typedef struct {
 } Position;
 
 
+// TODO: If this is a big concern for campatibility, you could substitute it since is only used in magics generation until now
 static inline int count_bits(uint64_t bitboard) {
     return _popcnt64(bitboard);
 }

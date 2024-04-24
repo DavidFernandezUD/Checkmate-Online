@@ -8,7 +8,7 @@
 int get_time_ms();
 
 
-void perft_driver(Position* pos, int depth, long* nodes);
+void perf_test(Position* pos, int depth, long* nodes);
 
 
 #endif // _PERF_H
