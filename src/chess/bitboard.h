@@ -109,7 +109,7 @@ void print_position(Position position);
 
 
 // Position initialization and parsing
-void parse_fen(Position* position, char* fen);
+void parse_fen(Position* position, const char* fen);
 
 void init_position(Position* position);
 

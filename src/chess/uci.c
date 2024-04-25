@@ -46,12 +46,12 @@ int parse_move(Position* pos, const char* move_string) {
 }
 
 
-void parse_position(Position* pos, char* uci_command) {
+void parse_position(Position* pos, const char* uci_command) {
 
     // Skip the "position " command keyword
     uci_command += 9;
 
-    char* current = uci_command;
+    const char* current = uci_command;
 
     // Parse "startpos"
     if (strncmp(current, "startpos", 8) == 0) {
@@ -105,5 +105,22 @@ void parse_position(Position* pos, char* uci_command) {
                 current += 5;
             }
         }
+    }
+}
+
+void parse_go(Position* pos, const char* uci_command) {
+
+    const char* current = strstr(uci_command, "depth");
+
+    int depth = -1;
+
+    if (current != NULL) {
+
+        // Skip "depth " cammand keyword
+        current += 6;
+
+        depth = atoi(current);
+
+        printf("Depth %d\n", depth);
     }
 }

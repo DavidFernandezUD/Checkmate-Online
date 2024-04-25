@@ -98,7 +98,7 @@ void print_position(Position position) {
 }
 
 
-void parse_fen(Position* position, char* fen) {
+void parse_fen(Position* position, const char* fen) {
 
     memset(position->bitboards, 0ULL, sizeof(position->bitboards));
     memset(position->occupancies, 0ULL, sizeof(position->occupancies));

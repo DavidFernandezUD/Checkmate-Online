@@ -22,5 +22,7 @@ int main() {
 
     print_position(pos);
 
+    parse_go(&pos, "go depth 12");
+
     return 0;
 }
