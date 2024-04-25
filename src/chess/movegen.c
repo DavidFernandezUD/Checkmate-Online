@@ -51,7 +51,7 @@ void print_attacked_squares(Position* position) {
 static inline void generate_pawn_moves(Position* position, MoveList* move_list) {
 
     int src_square;
-    int dest_square;
+    int dst_square;
     uint64_t bitboard;
     uint64_t attacks;
 
@@ -63,24 +63,24 @@ static inline void generate_pawn_moves(Position* position, MoveList* move_list) 
             src_square = get_ls1b_index(bitboard);
 
             // Quiet moves
-            dest_square = src_square - 8;
-            if ((dest_square >= a8) && !GET_BIT(position->occupancies[BOTH], dest_square)) {
+            dst_square = src_square - 8;
+            if ((dst_square >= a8) && !GET_BIT(position->occupancies[BOTH], dst_square)) {
                     
                 // Pawn promotion
-                if (dest_square <= h8) {
-                    push_move(move_list, encode_move(src_square, dest_square, P, N, 0));
-                    push_move(move_list, encode_move(src_square, dest_square, P, B, 0));
-                    push_move(move_list, encode_move(src_square, dest_square, P, R, 0));
-                    push_move(move_list, encode_move(src_square, dest_square, P, Q, 0));
+                if (dst_square <= h8) {
+                    push_move(move_list, encode_move(src_square, dst_square, P, N, 0));
+                    push_move(move_list, encode_move(src_square, dst_square, P, B, 0));
+                    push_move(move_list, encode_move(src_square, dst_square, P, R, 0));
+                    push_move(move_list, encode_move(src_square, dst_square, P, Q, 0));
                 } else {
 
                     // 1 square moves
-                    push_move(move_list, encode_move(src_square, dest_square, P, 0, 0));
+                    push_move(move_list, encode_move(src_square, dst_square, P, 0, 0));
 
                     // 2 square moves
-                    dest_square = src_square - 16;
-                    if (src_square >= a2 && src_square <= h2  && !GET_BIT(position->occupancies[BOTH], dest_square)) {
-                        push_move(move_list, encode_move(src_square, dest_square, P, 0, DOUBLE_PUSH));
+                    dst_square = src_square - 16;
+                    if (src_square >= a2 && src_square <= h2  && !GET_BIT(position->occupancies[BOTH], dst_square)) {
+                        push_move(move_list, encode_move(src_square, dst_square, P, 0, DOUBLE_PUSH));
                     }
                 }
             }
@@ -89,20 +89,20 @@ static inline void generate_pawn_moves(Position* position, MoveList* move_list) 
             attacks = pawn_attacks[WHITE][src_square] & position->occupancies[BLACK];
             while (attacks) {
 
-                dest_square = get_ls1b_index(attacks);
+                dst_square = get_ls1b_index(attacks);
 
                 // Capture promotions
-                if (dest_square <= h8) {
-                    push_move(move_list, encode_move(src_square, dest_square, P, N, CAPTURE));
-                    push_move(move_list, encode_move(src_square, dest_square, P, B, CAPTURE));
-                    push_move(move_list, encode_move(src_square, dest_square, P, R, CAPTURE));
-                    push_move(move_list, encode_move(src_square, dest_square, P, Q, CAPTURE));
+                if (dst_square <= h8) {
+                    push_move(move_list, encode_move(src_square, dst_square, P, N, CAPTURE));
+                    push_move(move_list, encode_move(src_square, dst_square, P, B, CAPTURE));
+                    push_move(move_list, encode_move(src_square, dst_square, P, R, CAPTURE));
+                    push_move(move_list, encode_move(src_square, dst_square, P, Q, CAPTURE));
                 }
                 // Normal capture
                 else {
-                    push_move(move_list, encode_move(src_square, dest_square, P, 0, CAPTURE));
+                    push_move(move_list, encode_move(src_square, dst_square, P, 0, CAPTURE));
                 }
-                POP_BIT(attacks, dest_square);
+                POP_BIT(attacks, dst_square);
             }
 
             // Enpassant captures
@@ -111,8 +111,8 @@ static inline void generate_pawn_moves(Position* position, MoveList* move_list) 
                 uint64_t enpassant_attacks = pawn_attacks[WHITE][src_square] & (1ULL << position->enpassant);
 
                 if (enpassant_attacks) {
-                    dest_square = get_ls1b_index(enpassant_attacks);
-                    push_move(move_list, encode_move(src_square, dest_square, P, 0, CAPTURE | ENPASSANT));
+                    dst_square = get_ls1b_index(enpassant_attacks);
+                    push_move(move_list, encode_move(src_square, dst_square, P, 0, CAPTURE | ENPASSANT));
                 }
             }
             POP_BIT(bitboard, src_square);
@@ -122,25 +122,25 @@ static inline void generate_pawn_moves(Position* position, MoveList* move_list) 
         while (bitboard) {
 
             src_square = get_ls1b_index(bitboard);
-            dest_square = src_square + 8;
+            dst_square = src_square + 8;
                 
-            if ((dest_square <= h1) && !GET_BIT(position->occupancies[BOTH], dest_square)) {
+            if ((dst_square <= h1) && !GET_BIT(position->occupancies[BOTH], dst_square)) {
                 
                 // Pawn promotion
-                if (dest_square >= a1) {
-                    push_move(move_list, encode_move(src_square, dest_square, p, n, 0));
-                    push_move(move_list, encode_move(src_square, dest_square, p, b, 0));
-                    push_move(move_list, encode_move(src_square, dest_square, p, r, 0));
-                    push_move(move_list, encode_move(src_square, dest_square, p, q, 0));
+                if (dst_square >= a1) {
+                    push_move(move_list, encode_move(src_square, dst_square, p, n, 0));
+                    push_move(move_list, encode_move(src_square, dst_square, p, b, 0));
+                    push_move(move_list, encode_move(src_square, dst_square, p, r, 0));
+                    push_move(move_list, encode_move(src_square, dst_square, p, q, 0));
                 } else {
                     
                     // 1 square moves
-                    push_move(move_list, encode_move(src_square, dest_square, p, 0, 0));
+                    push_move(move_list, encode_move(src_square, dst_square, p, 0, 0));
                     
                     // 2 square moves
-                    dest_square = src_square + 16;
-                    if (src_square >= a7 && src_square <= h7  && !GET_BIT(position->occupancies[BOTH], dest_square)) {
-                        push_move(move_list, encode_move(src_square, dest_square, p, 0, DOUBLE_PUSH));
+                    dst_square = src_square + 16;
+                    if (src_square >= a7 && src_square <= h7  && !GET_BIT(position->occupancies[BOTH], dst_square)) {
+                        push_move(move_list, encode_move(src_square, dst_square, p, 0, DOUBLE_PUSH));
                     }
                 }
             }
@@ -149,20 +149,20 @@ static inline void generate_pawn_moves(Position* position, MoveList* move_list) 
             attacks = pawn_attacks[BLACK][src_square] & position->occupancies[WHITE];
             while (attacks) {
 
-                dest_square = get_ls1b_index(attacks);
+                dst_square = get_ls1b_index(attacks);
 
                 // Capture promotions
-                if (dest_square >= a1) {
-                    push_move(move_list, encode_move(src_square, dest_square, p, n, CAPTURE));
-                    push_move(move_list, encode_move(src_square, dest_square, p, b, CAPTURE));
-                    push_move(move_list, encode_move(src_square, dest_square, p, r, CAPTURE));
-                    push_move(move_list, encode_move(src_square, dest_square, p, q, CAPTURE));
+                if (dst_square >= a1) {
+                    push_move(move_list, encode_move(src_square, dst_square, p, n, CAPTURE));
+                    push_move(move_list, encode_move(src_square, dst_square, p, b, CAPTURE));
+                    push_move(move_list, encode_move(src_square, dst_square, p, r, CAPTURE));
+                    push_move(move_list, encode_move(src_square, dst_square, p, q, CAPTURE));
                 }
                 // Normal captures
                 else {
-                    push_move(move_list, encode_move(src_square, dest_square, p, 0, CAPTURE));
+                    push_move(move_list, encode_move(src_square, dst_square, p, 0, CAPTURE));
                 }
-                POP_BIT(attacks, dest_square);
+                POP_BIT(attacks, dst_square);
             }
 
             // Enpassant captures
@@ -171,8 +171,8 @@ static inline void generate_pawn_moves(Position* position, MoveList* move_list) 
                 uint64_t enpassant_attacks = pawn_attacks[BLACK][src_square] & (1ULL << position->enpassant);
 
                 if (enpassant_attacks) {
-                    dest_square = get_ls1b_index(enpassant_attacks);
-                    push_move(move_list, encode_move(src_square, dest_square, p, 0, CAPTURE | ENPASSANT));
+                    dst_square = get_ls1b_index(enpassant_attacks);
+                    push_move(move_list, encode_move(src_square, dst_square, p, 0, CAPTURE | ENPASSANT));
                 }
             }
             POP_BIT(bitboard, src_square);
@@ -236,7 +236,7 @@ void generate_moves(Position* position, MoveList* move_list) {
     for (int piece = start_piece; piece <= end_piece; piece++) {
 
         int src_square;
-        int dest_square;
+        int dst_square;
         uint64_t bitboard;
         uint64_t attacks;
 
@@ -259,17 +259,17 @@ void generate_moves(Position* position, MoveList* move_list) {
 
             while (attacks) {
                 
-                dest_square = get_ls1b_index(attacks);
+                dst_square = get_ls1b_index(attacks);
 
                 // Quiet move
-                if (!GET_BIT(position->occupancies[!position->turn], dest_square)) {
-                    push_move(move_list, encode_move(src_square, dest_square, piece, 0, 0));
+                if (!GET_BIT(position->occupancies[!position->turn], dst_square)) {
+                    push_move(move_list, encode_move(src_square, dst_square, piece, 0, 0));
                 } 
                 // Capture
                 else {
-                    push_move(move_list, encode_move(src_square, dest_square, piece, 0, CAPTURE));
+                    push_move(move_list, encode_move(src_square, dst_square, piece, 0, CAPTURE));
                 }
-                POP_BIT(attacks, dest_square);
+                POP_BIT(attacks, dst_square);
             }
             POP_BIT(bitboard, src_square);
         }

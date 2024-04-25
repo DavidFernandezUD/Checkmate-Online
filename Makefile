@@ -38,7 +38,7 @@ $(BIN_DIR)/chess_profile: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
 # Tests
 test: $(BIN_DIR)/test
 
-$(BIN_DIR)/test: $(TEST_DIR)/movegen_test.c $(wildcard $(SRC_DIR)/chess/*.c)
+$(BIN_DIR)/test: $(TEST_DIR)/test_movegen.c $(wildcard $(SRC_DIR)/chess/*.c)
 	$(CC) $(CFLAGS) $^ -o $@
 
 	./$(BIN_DIR)/test

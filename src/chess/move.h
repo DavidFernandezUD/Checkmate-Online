@@ -19,7 +19,7 @@
 
 
 #define GET_MOVE_SRC(move) ((move) & 0x3f)
-#define GET_MOVE_DEST(move) (((move) & 0xfc0) >> 6)
+#define GET_MOVE_DST(move) (((move) & 0xfc0) >> 6)
 #define GET_MOVE_PIECE(move) (((move) & 0xf000) >> 12)
 #define GET_MOVE_PROMOTION(move) (((move) & 0xf0000) >> 16)
 
@@ -34,12 +34,12 @@ typedef enum {CAPTURE = 1, DOUBLE_PUSH = 2, ENPASSANT = 4, CASTLING = 8} MoveFla
 // Move encoding
 static inline int encode_move(
     int src_square,
-    int dest_square,
+    int dst_square,
     int piece,
     int promoted,
     MoveFlags flags) {
         
-    return src_square | (dest_square << 6) | (piece << 12) | (promoted << 16) | (flags << 20);
+    return src_square | (dst_square << 6) | (piece << 12) | (promoted << 16) | (flags << 20);
 }
 
 

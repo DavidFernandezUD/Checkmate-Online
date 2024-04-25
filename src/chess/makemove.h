@@ -26,7 +26,7 @@ static inline int make_move(Position* position, int move, MoveType type) {
 
         // Parse move
         int src_square = GET_MOVE_SRC(move);
-        int dest_square = GET_MOVE_DEST(move);
+        int dst_square = GET_MOVE_DST(move);
         int piece = GET_MOVE_PIECE(move);
         int promotion = GET_MOVE_PROMOTION(move);
         int capture = IS_MOVE_CAPTURE(move);
@@ -36,13 +36,13 @@ static inline int make_move(Position* position, int move, MoveType type) {
 
         // Make move
         POP_BIT(position->bitboards[piece], src_square);
-        SET_BIT(position->bitboards[piece], dest_square);
+        SET_BIT(position->bitboards[piece], dst_square);
 
         // Updating occupancies
         POP_BIT(position->occupancies[position->turn], src_square);
         POP_BIT(position->occupancies[BOTH], src_square);
-        SET_BIT(position->occupancies[position->turn], dest_square);
-        SET_BIT(position->occupancies[BOTH], dest_square);
+        SET_BIT(position->occupancies[position->turn], dst_square);
+        SET_BIT(position->occupancies[BOTH], dst_square);
 
         // Captures
         if (capture) {
@@ -51,11 +51,11 @@ static inline int make_move(Position* position, int move, MoveType type) {
             int end_piece = (position->turn == WHITE) ? k : K;
     
             for (int piece = start_piece; piece <= end_piece; piece++) {
-                if (GET_BIT(position->bitboards[piece], dest_square)) {
-                    POP_BIT(position->bitboards[piece], dest_square);
+                if (GET_BIT(position->bitboards[piece], dst_square)) {
+                    POP_BIT(position->bitboards[piece], dst_square);
                     
                     // Update opposite side occupancy
-                    POP_BIT(position->occupancies[!position->turn], dest_square);
+                    POP_BIT(position->occupancies[!position->turn], dst_square);
                     break; // NOTE: No need to search for more pieces in a single square
                 }
             }
@@ -63,20 +63,20 @@ static inline int make_move(Position* position, int move, MoveType type) {
 
         // Promotions
         if (promotion) {
-            POP_BIT(position->bitboards[piece], dest_square);
-            SET_BIT(position->bitboards[promotion], dest_square);
+            POP_BIT(position->bitboards[piece], dst_square);
+            SET_BIT(position->bitboards[promotion], dst_square);
         }
 
         // Enpassant
         if (enpassant) {
             if (position->turn == WHITE) {
-                POP_BIT(position->bitboards[p], dest_square + 8);
-                POP_BIT(position->occupancies[BLACK], dest_square + 8);
-                POP_BIT(position->occupancies[BOTH], dest_square + 8);
+                POP_BIT(position->bitboards[p], dst_square + 8);
+                POP_BIT(position->occupancies[BLACK], dst_square + 8);
+                POP_BIT(position->occupancies[BOTH], dst_square + 8);
             } else {
-                POP_BIT(position->bitboards[P], dest_square - 8);
-                POP_BIT(position->occupancies[WHITE], dest_square - 8);
-                POP_BIT(position->occupancies[BOTH], dest_square - 8);
+                POP_BIT(position->bitboards[P], dst_square - 8);
+                POP_BIT(position->occupancies[WHITE], dst_square - 8);
+                POP_BIT(position->occupancies[BOTH], dst_square - 8);
             }
         }
 
@@ -85,12 +85,12 @@ static inline int make_move(Position* position, int move, MoveType type) {
 
         // Double pawn pushes
         if (double_push) {
-            position->enpassant = (position->turn == WHITE) ? dest_square + 8 : dest_square - 8;
+            position->enpassant = (position->turn == WHITE) ? dst_square + 8 : dst_square - 8;
         }
 
         // Castling
         if (castle) {
-            switch (dest_square) {
+            switch (dst_square) {
                 case g1:
                     POP_BIT(position->bitboards[R], h1);
                     SET_BIT(position->bitboards[R], f1);
@@ -128,7 +128,7 @@ static inline int make_move(Position* position, int move, MoveType type) {
 
         // Update castling rights
         position->castling &= CASTLING_RIGHTS[src_square];  // Check for king or rooks moving from initial position
-        position->castling &= CASTLING_RIGHTS[dest_square]; // Check for pieces capturing rooks at initial position
+        position->castling &= CASTLING_RIGHTS[dst_square]; // Check for pieces capturing rooks at initial position
 
         // Make sure king is not in check after making move
         if (position->turn == WHITE) {

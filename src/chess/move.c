@@ -9,7 +9,7 @@ void print_move(int move) {
         printf(
             "%s%s%c     %c      %s      %s      %s      %s\n",
             square_to_coordinates[GET_MOVE_SRC(move)], 
-            square_to_coordinates[GET_MOVE_DEST(move)],
+            square_to_coordinates[GET_MOVE_DST(move)],
             GET_MOVE_PROMOTION(move) ? tolower(ASCII_PIECES[GET_MOVE_PROMOTION(move)]) : ' ',
             ASCII_PIECES[GET_MOVE_PIECE(move)],
             IS_MOVE_CAPTURE(move) ? "true " : "false",
@@ -21,7 +21,7 @@ void print_move(int move) {
         printf(
             "%s%s%c     %s      %s      %s      %s      %s\n",
             square_to_coordinates[GET_MOVE_SRC(move)], 
-            square_to_coordinates[GET_MOVE_DEST(move)],
+            square_to_coordinates[GET_MOVE_DST(move)],
             GET_MOVE_PROMOTION(move) ? tolower(ASCII_PIECES[GET_MOVE_PROMOTION(move)]) : ' ',
             UNICODE_PIECES[GET_MOVE_PIECE(move)],
             IS_MOVE_CAPTURE(move) ? "true " : "false",
