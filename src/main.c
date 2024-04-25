@@ -17,24 +17,10 @@ int main() {
     init_piece_attacks();
 
     Position pos;
-    long nodes = 0;
 
-    parse_fen(&pos, START_POSITION);
+    parse_position(&pos, "position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 e7e5 g1f3 ");
+
     print_position(pos);
-
-    // int start = get_time_ms();
-    // perf_test(&pos, 6, &nodes);
-    // int end = get_time_ms();
-
-    // printf("Time: %dms Nodes: %ld\n", end - start, nodes);
-    
-    int move = parse_move(&pos, "g1f3");
-
-    if (move) {
-        print_move(move);
-    } else {
-        printf("Ilegal move!\n");
-    }
 
     return 0;
 }
