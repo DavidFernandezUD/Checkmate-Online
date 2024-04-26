@@ -1,3 +1,16 @@
+/* 
+ * +--------------------+
+ * |  Checkmate-Online  |
+ * +--------------------+
+ * 
+ * Representation of a move as a 32 bit number (int). All the necesary information
+ * is encoded in the 32 bit number, including source square, destination square,
+ * piece, promotion pice and various flags indicating capture, double push, enpassant
+ * and or castling moves. Also includes functions and macros to encode and decode moves
+ * in this format, and a MoveList to store multiple moves.
+ * 
+ * Author: David Fernandez Fernandez <david.f@opendeusto.es>
+ */
 
 #ifndef _MOVE_H
 #define _MOVE_H

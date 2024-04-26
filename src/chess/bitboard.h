@@ -1,3 +1,15 @@
+/* 
+ * +--------------------+
+ * |  Checkmate-Online  |
+ * +--------------------+
+ * 
+ * Fundamental bitboards operations and chess position representation, including
+ * various commonly used enums. Includes functions for printing bitboards, positions,
+ * parsing FEN strings into positions, and initializing positions.
+ * 
+ * Author: David Fernandez Fernandez <david.f@opendeusto.es>
+ */
+
 #include <stdint.h>
 
 #ifdef _WIN64

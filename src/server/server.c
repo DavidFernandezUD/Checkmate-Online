@@ -2,9 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../lib/sqlite/sqlite3.h"
-
 #include "server.h"
 #include "database.h"
+
 
 // Useful admin username and password attributes
 #define MAX_A_USERNAME_LEN 50
@@ -14,25 +14,31 @@
 #define MAX_PARAMETER_LENGTH 10
 #define MAX_VALUE_LENGTH 100
 
+
 // TODO: Improve config file
+
 
 // Check if itroduced admin credentials are correct
 int checkCredentials(const char *username, const char *password) {
+    
     char line[MAX_A_CREDENTIALS_LENGTH];
-    char *usernameL;
-    char *passwordL;
+    char* tag;
+    char* value;
+    char* usernameL;
+    char* passwordL;
     
     // Open the admin config file
-    FILE *file = fopen("config/serverconfig.txt", "r");
+    FILE* file = fopen("config/serverconfig.txt", "r");
 
     // Check if the admin config file
     if (file == NULL) {
-        printf("Error opening the config file.\n");
-        return 0;
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed opening config file at config/serverconfig.txt\n");
+        exit(1);
     }
 
     // Check if the admin credentials coincide with the ones in the config file
     while (fgets(line, MAX_A_CREDENTIALS_LENGTH, file) != NULL) {
+
         usernameL = strtok(line, ":");
         passwordL = strtok(NULL, ":");
 
@@ -49,8 +55,10 @@ int checkCredentials(const char *username, const char *password) {
     return 0;
 }
 
+
 // Request admin credentials in the console
 void requestCredentials(int* credentialsValid) {
+
     char username[MAX_A_USERNAME_LEN];
     char password[MAX_A_PASSWORD_LEN];
 
@@ -59,17 +67,16 @@ void requestCredentials(int* credentialsValid) {
     if (fgets(username, MAX_A_USERNAME_LEN, stdin) != NULL) {
         username[strcspn(username, "\n")] = 0; // Remove the line break from the admin username
     } else {
-        fprintf(stderr, "Error reading user input\n");
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
         exit(1);
     }
     
-
     // Request the admin password
     printf("Please, enter your password: ");
     if (fgets(password, MAX_A_PASSWORD_LEN, stdin)) {
         password[strcspn(password, "\n")] = 0; // Remove the line break from the admin password
     } else {
-        fprintf(stderr, "Error reading user input\n");
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
         exit(1);
     }
 
@@ -83,8 +90,10 @@ void requestCredentials(int* credentialsValid) {
     }
 }
 
+
 // Ask and update parameters of the USERS table
 void update_user(sqlite3* db) {
+    
     printf("Enter the ID of the user you want to edit: ");
     int user_id;
     scanf("%d", &user_id);
@@ -98,9 +107,10 @@ void update_user(sqlite3* db) {
     scanf("%s", new_value);
 
     if (update_user_parameter(db, user_id, parameter, new_value) != 0) {
-        fprintf(stderr, "Error updating user parameter.\n");
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
     }
 }
+
 
 // Delete selected user from the database
 void remove_user(sqlite3* db) {
@@ -110,9 +120,10 @@ void remove_user(sqlite3* db) {
     char condition[50];
     sprintf(condition, "user_id = %d", user_id);
     if (delete_rows(db, "USERS", condition) != 0) {
-        fprintf(stderr, "Error deleting rows from the USERS table.\n");
+        fprintf(stderr, "\e[0;31m[ERROR\e[0m deleting rows from the USERS table\n");
     }
 }
+
 
 // Handle user managing menu options
 void manage_users_menu(sqlite3* db) {
@@ -141,6 +152,7 @@ void manage_users_menu(sqlite3* db) {
     } while (choice != 'b');
 }
 
+
 // Show options in the main menu
 void show_main_menu() {
     printf("\nMain Menu\n");
@@ -149,6 +161,7 @@ void show_main_menu() {
     printf("m -> Show Matches\n");
     printf("q -> Quit\n");
 }
+
 
 // Handle main menu options
 void handle_main_menu_option(sqlite3* db, char choice) {

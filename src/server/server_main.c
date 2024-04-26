@@ -2,6 +2,7 @@
 #include "server.h"
 #include "database.h"
 
+
 int main() {
 
     // Request and check admin credentials in the console
@@ -14,7 +15,7 @@ int main() {
     // Initialize database
     sqlite3 *db;
     if (initialize_db(&db) != 0) {
-        fprintf(stderr, "Failed to initialize the database.\n");
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed to initialize the database\n");
         return 1;
     }
 

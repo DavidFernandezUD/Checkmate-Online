@@ -1,3 +1,14 @@
+/* 
+ * +--------------------+
+ * |  Checkmate-Online  |
+ * +--------------------+
+ * 
+ * Universal Chess Interface (UCI) protocol implementation to allow the chess engine
+ * to comunicate with general purpose chess user interfaces.
+ * 
+ * Author: David Fernandez Fernandez <david.f@opendeusto.es>
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include "bitboard.h"

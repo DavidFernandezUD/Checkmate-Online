@@ -1,11 +1,14 @@
 #include "../../lib/sqlite/sqlite3.h"
 
-#ifndef DATABASE_H
-#define DATABASE_H
+
+#ifndef _DATABASE_H
+#define _DATABASE_H
+
 
 // Useful username and password attributes
 #define MAX_P_USERNAME_LENGTH 50
 #define MAX_P_PASSWORD_LENGTH 50
+
 
 // User struct
 typedef struct {
@@ -18,6 +21,7 @@ typedef struct {
     float winrate_black;
 } User;
 
+
 // Match struct
 typedef struct {
     char date[20];
@@ -26,12 +30,16 @@ typedef struct {
     char match_type[20];
 } Match;
 
-// Open/create and close database
+
+// Open or create database
 int initialize_db(sqlite3** db);
+
+// Close database
 void close_database(sqlite3* db);
 
 // Show users in the console
 void show_users(sqlite3* db);
+
 // Show matches in the console
 void show_matches(sqlite3* db);
 
@@ -41,4 +49,5 @@ int delete_rows(sqlite3* db, const char* table, const char* condition);
 // Update parameters of the USERS table
 int update_user_parameter(sqlite3* db, int user_id, const char* parameter, const char* new_value);
 
-#endif
+
+#endif // _DATABASE_H

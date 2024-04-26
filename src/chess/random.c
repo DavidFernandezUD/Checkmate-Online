@@ -1,3 +1,14 @@
+/* 
+ * +--------------------+
+ * |  Checkmate-Online  |
+ * +--------------------+
+ * 
+ * 64 bit pseudorandom number generator and candidate magic number generator for sliding
+ * piece attack table generation.
+ * 
+ * Author: David Fernandez Fernandez <david.f@opendeusto.es>
+ */
+
 #include <stdlib.h>
 #include <stdint.h>
 

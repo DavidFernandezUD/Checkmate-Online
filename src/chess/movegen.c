@@ -1,3 +1,14 @@
+/* 
+ * +--------------------+
+ * |  Checkmate-Online  |
+ * +--------------------+
+ * 
+ * Move generator that generates all posible legal moves from a given position and
+ * adds them to a stack (MoveList).
+ * 
+ * Author: David Fernandez Fernandez <david.f@opendeusto.es>
+ */
+
 #include <stdio.h>
 #include <stdbool.h>
 #include "bitboard.h"

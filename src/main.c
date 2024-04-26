@@ -1,3 +1,13 @@
+/* 
+ * +--------------------+
+ * |  Checkmate-Online  |
+ * +--------------------+
+ * 
+ * Chess module testing placeholder.
+ * 
+ * Author: David Fernandez Fernandez <david.f@opendeusto.es>
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

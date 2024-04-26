@@ -1,3 +1,14 @@
+/* 
+ * +--------------------+
+ * |  Checkmate-Online  |
+ * +--------------------+
+ * 
+ * Precalculated attack tables for move generation, including precalculated
+ * magic numbers for slider pieces attack table indexing.
+ * 
+ * Author: David Fernandez Fernandez <david.f@opendeusto.es>
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

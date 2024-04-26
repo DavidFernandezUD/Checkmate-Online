@@ -1,3 +1,14 @@
+/* 
+ * +--------------------+
+ * |  Checkmate-Online  |
+ * +--------------------+
+ * 
+ * Move generator unit test that verifies that the number of generated leaf nodes at
+ * a certain depth, from a given position, match the spected amount of leaf nodes.
+ * 
+ * Author: David Fernandez Fernandez <david.f@opendeusto.es>
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -73,12 +84,12 @@ int main() {
 
         // Assert results
         if (nodes == expected_nodes[i]) {
-            printf("Test %d: \033[0;32m[PASSED]\033[0m in %4d ms\n", i + 1, stop - start);
+            printf("Test %d: \e[0;32m[PASSED]\e[0m in %4d ms\n", i + 1, stop - start);
         } else {
-            printf("Test %d: \033[0;31m[FAILED]\033[0m in %4d ms\n\n", i + 1, stop - start);
-            printf("    \033[0;31mposition: %s\n", positions[i]);
+            printf("Test %d: \e[0;31m[FAILED]\e[0m in %4d ms\n\n", i + 1, stop - start);
+            printf("    \e[0;31mposition: %s\n", positions[i]);
             printf("    expected nodes: %d\n", expected_nodes[i]);
-            printf("    generated nodes: %ld\n\033[0m", nodes);
+            printf("    generated nodes: %ld\n\e[0m", nodes);
 
             printf("\n");
             printf(
