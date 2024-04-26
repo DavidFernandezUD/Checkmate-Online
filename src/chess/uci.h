@@ -22,5 +22,7 @@ void parse_position(Position* pos, const char* uci_command);
 
 void parse_go(Position* pos, const char* uci_command);
 
+void uci_loop(Position* pos);
+
 
 #endif // _UCI_H

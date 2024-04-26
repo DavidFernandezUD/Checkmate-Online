@@ -15,6 +15,7 @@
 #include "move.h"
 #include "movegen.h"
 #include "makemove.h"
+#include "search.h"
 #include "uci.h"
 
 
@@ -60,30 +61,38 @@ int parse_move(Position* pos, const char* move_string) {
 void parse_position(Position* pos, const char* uci_command) {
 
     // Skip the "position " command keyword
-    uci_command += 9;
+    if (strlen(uci_command) > 9) {
+        uci_command += 9;
+    } else {
+        // TODO: Handle errors better
+        fprintf(stderr, "\e[0;33m[WARNING]\e[0m Invalid position command passed to parse_position\n");
+        return;
+    }
 
     const char* current = uci_command;
 
     // Parse "startpos"
     if (strncmp(current, "startpos", 8) == 0) {
         parse_fen(pos, START_POSITION);
-    }
-
-    // Parse FEN string
-    current = strstr(uci_command, "fen");
-    if (current != NULL) {
-
-        // Skip "fen " command keyword
-        current += 4;
-
-        parse_fen(pos, current);
     } else {
 
-        // Default to starting position
-        parse_fen(pos, START_POSITION);
-        
-        // TODO: Handle errors better
-        fprintf(stderr, "\e[0;33m[WARNING]\e[0m No position passed to parse_position\n");
+        // Parse FEN string
+        current = strstr(uci_command, "fen");
+        if (current != NULL) {
+
+            // Skip "fen " command keyword
+            current += 4;
+
+            parse_fen(pos, current);
+        } else {
+
+            // Default to starting position
+            parse_fen(pos, START_POSITION);
+            
+            // TODO: Handle errors better
+            fprintf(stderr, "\e[0;33m[WARNING]\e[0m Invalid position passed to parse_position\n");
+            return;
+        }
     }
 
     // Parse moves after position
@@ -104,8 +113,7 @@ void parse_position(Position* pos, const char* uci_command) {
                 
                 // TODO: Handle errors better
                 fprintf(stderr, "\e[0;33m[WARNING]\e[0m Ilegal move in parse_position\n");
-
-                break;
+                return;
             }
 
             // Move pointer to next move
@@ -117,7 +125,11 @@ void parse_position(Position* pos, const char* uci_command) {
             }
         }
     }
+
+    // PLACEHOLDER
+    print_position(*pos);
 }
+
 
 void parse_go(Position* pos, const char* uci_command) {
 
@@ -131,7 +143,75 @@ void parse_go(Position* pos, const char* uci_command) {
         current += 6;
 
         depth = atoi(current);
+        if (depth > 0 && depth <= MAX_DEPTH) {
+            search_position(pos, depth);
+        } else {
+            fprintf(stderr, "\e[0;33m[WARNING]\e[0m Invalid go depth\n");
+            return;
+        }
+    } else {
+        fprintf(stderr, "\e[0;33m[WARNING]\e[0m Invalid go command\n");
+        return;
+    }
+}
 
-        printf("Depth %d\n", depth);
+
+void uci_loop(Position* pos) {
+
+    setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+
+    const int BUFFER_LEN = 2048;
+    char input_buffer[BUFFER_LEN];
+
+    printf("uciok\n");
+
+    while (1) {
+
+        // Reset user input
+        memset(input_buffer, 0 , sizeof(input_buffer));
+
+        fflush(stdout);
+
+        // Get user input
+        if (!fgets(input_buffer, BUFFER_LEN, stdin)) {
+            continue;
+        } 
+        
+        else if (*input_buffer == '\n') {
+            continue;
+        }
+
+        // UCI handshake
+        else if (strncmp(input_buffer, "isready", 7) == 0) {
+            printf("readyok\n");
+            continue;
+        }
+
+        // Parse UCI position
+        else if (strncmp(input_buffer, "position", 8) == 0) {
+            parse_position(pos, input_buffer);
+        }
+
+        // Parse UCI ucinewgame command
+        else if (strncmp(input_buffer, "ucinewgame", 10) == 0) {
+            parse_position(pos, "position startpos");
+        }
+
+        // Parse UCI go command
+        else if (strncmp(input_buffer, "go", 2) == 0) {
+            parse_go(pos, input_buffer);
+        }
+
+        // Parse UCI quit command
+        else if (strncmp(input_buffer, "quit", 4) == 0) {
+            break;
+        }
+
+        // Parse UCI uci command
+        else if (strncmp(input_buffer, "uci", 3) == 0) {
+            printf("id CHESS-E\n");
+            printf("uciok\n");
+        }
     }
 }

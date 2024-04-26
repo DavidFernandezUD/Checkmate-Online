@@ -28,11 +28,13 @@ int main() {
 
     Position pos;
 
-    parse_position(&pos, "position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 e7e5 g1f3 ");
+    // parse_position(&pos, "position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 e7e5 g1f3 ");
 
-    print_position(pos);
+    // print_position(pos);
 
-    parse_go(&pos, "go depth 12");
+    // parse_go(&pos, "go depth 12");
+
+    uci_loop(&pos);
 
     return 0;
 }
