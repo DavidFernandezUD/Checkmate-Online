@@ -20,6 +20,7 @@
 #include "chess/makemove.h"
 #include "chess/perftest.h"
 #include "chess/uci.h"
+#include "chess/eval.h"
 
 
 int main() {
@@ -27,14 +28,13 @@ int main() {
     init_piece_attacks();
 
     Position pos;
+    parse_fen(&pos, "rnbqkbnr/pp1p1ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1 ");
 
-    // parse_position(&pos, "position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 e7e5 g1f3 ");
+    print_position(pos);
 
-    // print_position(pos);
+    printf("Eval : %d\n", evaluate(&pos));
 
-    // parse_go(&pos, "go depth 12");
-
-    uci_loop(&pos);
+    // uci_loop(&pos);
 
     return 0;
 }

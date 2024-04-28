@@ -67,4 +67,4 @@ interface by passing commands through a console prompt.
 - [Negmax](https://www.chessprogramming.org/Negamax)
 - [Principal Variation Search](https://www.chessprogramming.org/Principal_Variation_Search)
 - [NNUE](https://www.chessprogramming.org/NNUE)
-
+- [Simple Evaluation](https://www.chessprogramming.org/Simplified_Evaluation_Function)
