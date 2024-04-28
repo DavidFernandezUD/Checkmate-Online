@@ -36,6 +36,16 @@ static inline int negmax(Position* pos, int depth, int alpha, int beta, int* hal
     // Increment nodes counter
     *nodes++;
 
+    // Check if king is checked
+    int checked;
+    if (pos->turn == WHITE) {
+        checked = is_square_attacked(pos, get_ls1b_index(pos->bitboards[K]), BLACK);
+    } else {
+        checked = is_square_attacked(pos, get_ls1b_index(pos->bitboards[k]), WHITE);
+    }
+
+    int legal_moves = 0;
+
     // Current best move
     int current_best_move = 0;
 
@@ -66,6 +76,9 @@ static inline int negmax(Position* pos, int depth, int alpha, int beta, int* hal
             continue;
         }
 
+        // Increment legal moves count
+        legal_moves++;
+
         // get score  of current move
         int score = -negmax(pos, depth - 1, -beta, -alpha, half_move, nodes, best_move);
 
@@ -88,6 +101,21 @@ static inline int negmax(Position* pos, int depth, int alpha, int beta, int* hal
             if (*half_move == 0) {
                 current_best_move = move_list.moves[i];
             }
+        }
+    }
+
+    // If no legal moves in current position
+    if (legal_moves == 0) {
+        
+        // Checkmate
+        if (checked) {
+            // NOTE: We add half_move to prioritize checkmates in fewer moves
+            return -98000 + (*half_move);
+        } 
+        
+        // Stalemate
+        else {
+            return 0;
         }
     }
 

@@ -18,7 +18,7 @@ void search_position(Position* pos, int depth) {
 
     int best_move;
     int half_moves = 0;
-    int nodes;
+    int nodes = 0;
 
     int score = negmax(pos, depth, -99999, 99999, &half_moves, &nodes, &best_move);
 

@@ -125,9 +125,6 @@ void parse_position(Position* pos, const char* uci_command) {
             }
         }
     }
-
-    // PLACEHOLDER
-    print_position(*pos);
 }
 
 
