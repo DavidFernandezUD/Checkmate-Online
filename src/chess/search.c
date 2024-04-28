@@ -16,6 +16,11 @@
 
 void search_position(Position* pos, int depth) {
 
-    // TODO: Implement
-    printf("bestmove d2d4\n");
+    int best_move;
+    int half_moves = 0;
+    int nodes;
+
+    int score = negmax(pos, depth, -99999, 99999, &half_moves, &nodes, &best_move);
+
+    printf("bestmove %s%s\n", square_to_coordinates[GET_MOVE_SRC(best_move)], square_to_coordinates[GET_MOVE_DST(best_move)]);
 }

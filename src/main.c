@@ -21,6 +21,7 @@
 #include "chess/perftest.h"
 #include "chess/uci.h"
 #include "chess/eval.h"
+#include "chess/search.h"
 
 
 int main() {
@@ -30,11 +31,7 @@ int main() {
     Position pos;
     parse_fen(&pos, "rnbqkbnr/pp1p1ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1 ");
 
-    print_position(pos);
-
-    printf("Eval : %d\n", evaluate(&pos));
-
-    // uci_loop(&pos);
+    uci_loop(&pos);
 
     return 0;
 }

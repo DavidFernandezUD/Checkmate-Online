@@ -19,13 +19,13 @@
 
 
 // Attacks
-bool is_square_attacked(Position* position, Square square, Color attacker_color);
+bool is_square_attacked(const Position* position, Square square, Color attacker_color);
 
-void print_attacked_squares(Position* Position);
+void print_attacked_squares(const Position* Position);
 
 
 // Move generator
-void generate_moves(Position* position, MoveList* move_list);
+void generate_moves(const Position* position, MoveList* move_list);
 
 
 #endif // _MOVEGEN_H

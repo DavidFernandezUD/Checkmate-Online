@@ -17,7 +17,7 @@
 
 
 // TODO: Check if changing statement order improves engine performance
-bool is_square_attacked(Position* position, Square square, Color attacker_color) {
+bool is_square_attacked(const Position* position, Square square, Color attacker_color) {
 
     if (attacker_color == WHITE) {
         if (pawn_attacks[BLACK][square] & position->bitboards[P]) return true;                              // White Pawns
@@ -39,7 +39,7 @@ bool is_square_attacked(Position* position, Square square, Color attacker_color)
 }
 
 
-void print_attacked_squares(Position* position) {
+void print_attacked_squares(const Position* position) {
 
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
@@ -59,7 +59,7 @@ void print_attacked_squares(Position* position) {
 
 
 // TODO: Refactor this function
-static inline void generate_pawn_moves(Position* position, MoveList* move_list) {
+static inline void generate_pawn_moves(const Position* position, MoveList* move_list) {
 
     int src_square;
     int dst_square;
@@ -192,7 +192,7 @@ static inline void generate_pawn_moves(Position* position, MoveList* move_list) 
 }
 
 
-static inline void generate_castling_moves(Position* position, MoveList* move_list) {
+static inline void generate_castling_moves(const Position* position, MoveList* move_list) {
 
     if (position->turn == WHITE) {
 
@@ -232,7 +232,7 @@ static inline void generate_castling_moves(Position* position, MoveList* move_li
 }
 
 
-void generate_moves(Position* position, MoveList* move_list) {
+void generate_moves(const Position* position, MoveList* move_list) {
 
     // Initialize move list
     move_list->top = 0;

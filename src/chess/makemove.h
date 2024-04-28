@@ -149,7 +149,7 @@ static inline int make_move(Position* position, int move, MoveType type) {
 
         // Change turn
         position->turn ^= 1;
-        
+
     } else {
         if (IS_MOVE_CAPTURE(move)) {
             make_move(position, move, ALL_MOVES);

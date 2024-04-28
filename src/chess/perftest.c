@@ -32,7 +32,6 @@ int get_time_ms() {
     #endif
 }
 
-
 void perf_test(Position* pos, int depth, long* nodes) {
     
     if (depth == 0) {
@@ -44,7 +43,8 @@ void perf_test(Position* pos, int depth, long* nodes) {
     
     generate_moves(pos, &list);
     
-    for (int i = 0; i < list.top; i++) {   
+    for (int i = 0; i < list.top; i++) {
+
         Position pos_copy = *pos;
 
         if (make_move(pos, list.moves[i], ALL_MOVES)) {

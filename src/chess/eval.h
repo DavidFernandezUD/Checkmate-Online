@@ -27,7 +27,7 @@ extern const int king_scores[64];
 extern const int mirror_squares[64];
 
 
-static inline int evaluate(Position* pos) {
+static inline int evaluate(const Position* pos) {
 
     int score = 0;
 

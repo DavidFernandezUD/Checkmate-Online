@@ -10,6 +10,10 @@
  */
 
 #include "bitboard.h"
+#include "move.h"
+#include "movegen.h"
+#include "makemove.h"
+#include "eval.h"
 
 
 #ifndef _SEARCH_H
@@ -20,6 +24,79 @@
 
 
 void search_position(Position* pos, int depth);
+
+
+static inline int negmax(Position* pos, int depth, int alpha, int beta, int* half_move, int* nodes, int* best_move) {
+
+    // Base case
+    if (depth == 0) {
+        return evaluate(pos);
+    }
+
+    // Increment nodes counter
+    *nodes++;
+
+    // Current best move
+    int current_best_move = 0;
+
+    // Old value of alpha
+    int old_alpha = alpha;
+
+    // Generate possible moves in current position
+    MoveList move_list;
+    generate_moves(pos, &move_list);
+
+    // Loop over possible moves
+    for (int i = 0; i < move_list.top; i++) {
+
+        // Copy position before making move
+        Position pos_cpy = *pos;
+
+        (*half_move)++;
+
+        if (make_move(pos, move_list.moves[i], ALL_MOVES) == 0) {
+            
+            // Restore position
+            (*half_move)--;
+
+            // Restore position
+            *pos = pos_cpy;
+
+            // Skip to next move
+            continue;
+        }
+
+        // get score  of current move
+        int score = -negmax(pos, depth - 1, -beta, -alpha, half_move, nodes, best_move);
+
+        (*half_move)--;
+
+        // Restore position
+        *pos = pos_cpy;
+
+        // hard beta cutoff
+        if (score >= beta) {
+            return beta;
+        }
+
+        if (score > alpha) {
+
+            // Update new alpha
+            alpha = score;
+
+            // If root node, update current best move
+            if (*half_move == 0) {
+                current_best_move = move_list.moves[i];
+            }
+        }
+    }
+
+    if (old_alpha != alpha) {
+        *best_move = current_best_move;
+    }
+
+    return alpha;
+}
 
 
 #endif // _SEARCH_H
