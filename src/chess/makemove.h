@@ -153,9 +153,8 @@ static inline int make_move(Position* position, int move, MoveType type) {
     } else {
         if (IS_MOVE_CAPTURE(move)) {
             make_move(position, move, ALL_MOVES);
-        } else {
-            return 0;
         }
+        return 0;
     }
     return 1;
 }

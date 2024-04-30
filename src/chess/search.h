@@ -26,11 +26,58 @@
 void search_position(Position* pos, int depth);
 
 
+// TODO: Not sure if I should include half_move increments and decrements here as well
+static inline int quiescence(Position* pos, int alpha, int beta) {
+
+    int eval = evaluate(pos);
+
+    if (eval >= beta) {
+        return beta;
+    }
+
+    if (eval > alpha) {
+        alpha = eval;
+    }
+
+    MoveList move_list;
+    generate_moves(pos, &move_list);
+
+    for (int i = 0; i < move_list.top; i++) {
+
+        // Copy position before making move
+        Position pos_cpy = *pos;
+
+        // Only searching capture moves
+        if (make_move(pos, move_list.moves[i], CAPTURE_MOVES) == 0) {
+            *pos = pos_cpy;
+            continue;
+        }
+
+        int score = -quiescence(pos, -beta, -alpha);
+
+        *pos = pos_cpy;
+
+        if (score >= beta) {
+            return beta;
+        }
+
+        if (score > alpha) {
+            alpha = score;
+        }
+    }
+
+    return alpha;
+}
+
+
 static inline int negmax(Position* pos, int depth, int alpha, int beta, int* half_move, int* nodes, int* best_move) {
 
     // Base case
     if (depth == 0) {
-        return evaluate(pos);
+        // Quiescence search
+        return quiescence(pos, alpha, beta);
+
+        // return evaluate(pos);
     }
 
     // Increment nodes counter
