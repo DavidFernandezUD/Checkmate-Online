@@ -9,6 +9,7 @@
  */
 
 #include "bitboard.h"
+#include "move.h"
 
 
 #ifndef _EVAL_H
@@ -25,6 +26,8 @@ extern const int queen_scores[64];
 extern const int king_scores[64];
 
 extern const int mirror_squares[64];
+
+extern const int mvv_lva[12][12];
 
 
 static inline int evaluate(const Position* pos) {
@@ -72,6 +75,32 @@ static inline int evaluate(const Position* pos) {
 
     // Changes score sign based on turn for min-max algorithm
     return (pos->turn == WHITE) ? score : -score;
+}
+
+
+static inline int eval_move(const Position* pos, int move) {
+
+    if (IS_MOVE_CAPTURE(move)) {
+        
+        int dst_square = GET_MOVE_DST(move);
+
+        int start_piece = (pos->turn == WHITE) ? P : p;
+        int end_piece   = (pos->turn == WHITE) ? K : k;
+        
+        // NOTE: If the destination square down't have a piece (enpassant), it will dfault to pawn
+        int captured_piece = P;
+        for (int piece = start_piece; piece <= end_piece; piece++) {
+            if (GET_BIT(pos->bitboards[piece], dst_square)) {
+                captured_piece = piece;
+                break;
+            }
+        }
+
+        return mvv_lva[GET_MOVE_PIECE(move)][captured_piece];
+
+    }
+
+    return 0;
 }
 
 

@@ -27,7 +27,9 @@ void search_position(Position* pos, int depth);
 
 
 // TODO: Not sure if I should include half_move increments and decrements here as well
-static inline int quiescence(Position* pos, int alpha, int beta) {
+static inline int quiescence(Position* pos, int alpha, int beta, int* nodes) {
+
+    (*nodes)++;
 
     int eval = evaluate(pos);
 
@@ -53,7 +55,7 @@ static inline int quiescence(Position* pos, int alpha, int beta) {
             continue;
         }
 
-        int score = -quiescence(pos, -beta, -alpha);
+        int score = -quiescence(pos, -beta, -alpha, nodes);
 
         *pos = pos_cpy;
 
@@ -75,13 +77,13 @@ static inline int negmax(Position* pos, int depth, int alpha, int beta, int* hal
     // Base case
     if (depth == 0) {
         // Quiescence search
-        return quiescence(pos, alpha, beta);
+        return quiescence(pos, alpha, beta, nodes);
 
         // return evaluate(pos);
     }
 
     // Increment nodes counter
-    *nodes++;
+    (*nodes)++;
 
     // Check if king is checked
     int checked;
