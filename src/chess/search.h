@@ -44,6 +44,8 @@ static inline int quiescence(Position* pos, int alpha, int beta, int* nodes) {
     MoveList move_list;
     generate_moves(pos, &move_list);
 
+    sort_moves(pos, &move_list);
+
     for (int i = 0; i < move_list.top; i++) {
 
         // Copy position before making move
@@ -77,9 +79,9 @@ static inline int negmax(Position* pos, int depth, int alpha, int beta, int* hal
     // Base case
     if (depth == 0) {
         // Quiescence search
-        return quiescence(pos, alpha, beta, nodes);
+        // return quiescence(pos, alpha, beta, nodes);
 
-        // return evaluate(pos);
+        return evaluate(pos);
     }
 
     // Increment nodes counter
@@ -93,6 +95,11 @@ static inline int negmax(Position* pos, int depth, int alpha, int beta, int* hal
         checked = is_square_attacked(pos, get_ls1b_index(pos->bitboards[k]), WHITE);
     }
 
+    // If king is in check, increment search depth on that branch
+    if (checked) {
+        depth++;
+    }
+
     int legal_moves = 0;
 
     // Current best move
@@ -104,6 +111,8 @@ static inline int negmax(Position* pos, int depth, int alpha, int beta, int* hal
     // Generate possible moves in current position
     MoveList move_list;
     generate_moves(pos, &move_list);
+
+    sort_moves(pos, &move_list);
 
     // Loop over possible moves
     for (int i = 0; i < move_list.top; i++) {

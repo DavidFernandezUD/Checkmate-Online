@@ -29,7 +29,7 @@ int main() {
     init_piece_attacks();
 
     Position pos;
-    parse_fen(&pos, "rnbqkbnr/pp1p1ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1 ");
+    parse_fen(&pos, TRICKY_POSITION);
 
     uci_loop(&pos);
 
