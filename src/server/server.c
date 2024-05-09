@@ -133,7 +133,7 @@ void manage_users_menu(sqlite3* db) {
         printf("---------\n");
         printf("e -> Edit User\n");
         printf("r -> Remove User\n");
-        printf("b -> Go Back\n");
+        printf("q -> Go Back\n");
         printf("Choose an option: ");
         scanf(" %c", &choice);
         switch (choice) {
@@ -143,13 +143,13 @@ void manage_users_menu(sqlite3* db) {
             case 'r':
                 remove_user(db);
                 break;
-            case 'b':
+            case 'q':
                 break;
             default:
                 printf("Not a valid option\n");
                 break;
         }
-    } while (choice != 'b');
+    } while (choice != 'q');
 }
 
 
