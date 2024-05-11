@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <winsock2.h> 
 #include "../../lib/sqlite/sqlite3.h"
+
 #include "server.h"
 #include "database.h"
 
+// gcc src/server/server_main.c src/server/database.c src/server/server.c lib/sqlite/sqlite3.c -lm -lws2_32 -o bin/server
 
 // Useful admin username and password attributes
 #define MAX_A_USERNAME_LEN 50
@@ -14,6 +17,7 @@
 #define MAX_PARAMETER_LENGTH 10
 #define MAX_VALUE_LENGTH 100
 
+#define SERVER_PORT 8080
 
 // TODO: Improve config file
 
@@ -146,7 +150,7 @@ void manage_users_menu(sqlite3* db) {
             case 'q':
                 break;
             default:
-                printf("Not a valid option\n");
+                fprintf(stderr, "\e[0;31m[ERROR]\e[0m Not a valid option\n");
                 break;
         }
     } while (choice != 'q');
@@ -157,6 +161,7 @@ void manage_users_menu(sqlite3* db) {
 void show_main_menu() {
     printf("\nMain Menu\n");
     printf("---------\n");
+    printf("s -> Run Server\n");
     printf("u -> Manage Users\n");
     printf("m -> Show Matches\n");
     printf("q -> Quit\n");
@@ -166,6 +171,9 @@ void show_main_menu() {
 // Handle main menu options
 void handle_main_menu_option(sqlite3* db, char choice) {
     switch (choice) {
+        case 's':
+            start_server();
+            break;
         case 'u':
             manage_users_menu(db);
             break;
@@ -175,7 +183,61 @@ void handle_main_menu_option(sqlite3* db, char choice) {
         case 'q':
             break;
         default:
-            printf("Not a valid option\n");
+            fprintf(stderr, "\e[0;31m[ERROR]\e[0m Not a valid option\n");
             break;
     }
+}
+
+// Initialize server
+void start_server() {
+    WSADATA wsaData;
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (result != 0) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Error initializing Winsock\n");
+        return;
+    }
+
+    SOCKET server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket == INVALID_SOCKET) {
+        printf("Failed to create socket.\n");
+        WSACleanup();
+        return;
+    }
+
+    struct sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = INADDR_ANY;
+    server_address.sin_port = htons(SERVER_PORT);
+
+    if (bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) == SOCKET_ERROR) {
+        printf("Bind failed.\n");
+        closesocket(server_socket);
+        WSACleanup();
+        return;
+    }
+
+    if (listen(server_socket, SOMAXCONN) == SOCKET_ERROR) {
+        printf("Listen failed.\n");
+        closesocket(server_socket);
+        WSACleanup();
+        return;
+    }
+
+    printf("Server started successfully. Waiting for incoming connections...\n");
+
+    SOCKET client_socket;
+    struct sockaddr_in client_address;
+    int client_address_size = sizeof(client_address);
+
+    while ((client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_address_size)) != INVALID_SOCKET) {
+        printf("New connection accepted.\n");
+
+        // TODO: Handle client communication (send/receive data)
+        // TODO: Implement server logic
+
+        closesocket(client_socket);
+    }
+
+    closesocket(server_socket);
+    WSACleanup();
 }
