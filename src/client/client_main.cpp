@@ -4,17 +4,19 @@
 #include "client.h"
 
 int main() {
-
-    connectToServer();
+    SOCKET s = connect_to_server();
+    if (s == INVALID_SOCKET) {
+        return 1;
+    }
 
     char choice;
 
     // Main menu
     do {
         show_main_menu();
-        printf("Choose an option: ");
-        scanf(" %c", &choice); // Read user's choice
-        handle_main_menu_option(choice);
+        std::cout << "Choose an option: ";
+        std::cin >> choice;
+        handle_main_menu_option(choice, s);
     } while (choice != 'q');
     
     return 0;
