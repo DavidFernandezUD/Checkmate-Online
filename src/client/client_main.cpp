@@ -1,8 +1,11 @@
 #include <iostream>
+#include <winsock2.h> 
 
 #include "client.h"
 
 int main() {
+
+    connectToServer();
 
     char choice;
 
