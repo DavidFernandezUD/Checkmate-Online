@@ -1,12 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../../lib/sqlite/sqlite3.h"
 #include "database.h"
 
-
 // TODO add ON DELETE CASCADE to the MATCHES table
-
 
 // Just to test the "load_users" function
 User users[] = {
@@ -16,12 +10,9 @@ User users[] = {
 };
 int n_users = sizeof(users) / sizeof(users[0]);
 
-
 // Function to add users to the database
 int load_users(sqlite3* db, User* users, int n_users) {
-
-    for (int i = 0; i < n_users; i++) {
-        
+    for (int i = 0; i < n_users; i++) {   
         char select_query[512];
         sprintf(select_query, "SELECT COUNT(*) FROM USERS WHERE username='%s';", users[i].username);
 
@@ -63,7 +54,6 @@ int load_users(sqlite3* db, User* users, int n_users) {
     return 0;
 }
 
-
 // Just to test the "load_matches" function
 Match matches[] = {
         {"2024-04-04", 1, 2, "Standatd"},
@@ -71,7 +61,6 @@ Match matches[] = {
         {"2024-04-06", 1, 3, "Bullet"}
 };
 int n_matches = sizeof(matches) / sizeof(matches[0]);
-
 
 // Function to add matches to the database
 int load_matches(sqlite3* db, Match* matches, int n_matches) {
@@ -117,7 +106,6 @@ int load_matches(sqlite3* db, Match* matches, int n_matches) {
 
     return 0;
 }
-
 
 // Open or create database
 int initialize_db(sqlite3** db) {
@@ -209,12 +197,10 @@ int initialize_db(sqlite3** db) {
     return 0;
 }
 
-
 // Close database
 void close_database(sqlite3* db) {
     sqlite3_close(db);
 }
-
 
 // Show in the console every user in the database
 void show_users(sqlite3* db) {
@@ -316,7 +302,6 @@ int update_user_parameter(sqlite3* db, int user_id, const char* parameter, const
     }
     return 0;
 }
-
 
 // Delete selected row from the database
 int delete_rows(sqlite3* db, const char* table, const char* condition) {

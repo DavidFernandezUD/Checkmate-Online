@@ -1,7 +1,4 @@
-#include <stdio.h>
 #include "server.h"
-#include "database.h"
-
 
 int main() {
 

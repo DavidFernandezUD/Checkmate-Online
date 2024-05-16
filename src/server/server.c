@@ -1,27 +1,8 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <winsock2.h> 
-#include "../../lib/sqlite/sqlite3.h"
-
 #include "server.h"
-#include "database.h"
 
-// gcc src/server/server_main.c src/server/database.c src/server/server.c lib/sqlite/sqlite3.c -lm -lws2_32 -o bin/server
-
-// Useful admin username and password attributes
-#define MAX_A_USERNAME_LEN 50
-#define MAX_A_PASSWORD_LEN 50
-#define MAX_A_CREDENTIALS_LENGTH 100
-
-#define MAX_PARAMETER_LENGTH 10
-#define MAX_VALUE_LENGTH 100
-
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 6000
+// gcc src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c -lm -lws2_32 -o bin/server
 
 // TODO: Improve config file
-
 
 // Check if itroduced admin credentials are correct
 int checkCredentials(const char *username, const char *password) {
@@ -187,91 +168,4 @@ void handle_main_menu_option(sqlite3* db, char choice) {
             fprintf(stderr, "\e[0;31m[ERROR]\e[0m Not a valid option\n");
             break;
     }
-}
-
-// Initialize server
-void start_server() {
-	WSADATA wsaData;
-    SOCKET conn_socket;
-    struct sockaddr_in server;
-    struct sockaddr_in client;
-    char recvBuff[512];
-
-	printf("\nInitialising Winsock...\n");
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        printf("Failed. Error Code : %d", WSAGetLastError());
-        return;
-    }
-
-	printf("Initialised.\n");
-
-	//SOCKET creation
-	if ((conn_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
-        printf("Could not create socket : %d", WSAGetLastError());
-        WSACleanup();
-        return;
-    }
-
-	printf("Socket created.\n");
-
-	server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_family = AF_INET;
-    server.sin_port = htons(SERVER_PORT);
-
-	// BIND (the IP/port with socket)
-    if (bind(conn_socket, (struct sockaddr*)&server,
-             sizeof(server)) == SOCKET_ERROR) {
-        printf("Bind failed with error code: %d", WSAGetLastError());
-        closesocket(conn_socket);
-        WSACleanup();
-        return;
-    }
-
-	printf("Bind done.\n");
-
-	// LISTEN to incoming connections (socket server moves to listening mode)
-    if (listen(conn_socket, 1) == SOCKET_ERROR) {
-        printf("Listen failed with error code: %d", WSAGetLastError());
-        closesocket(conn_socket);
-        WSACleanup();
-        return;
-    }
-
-	// ACCEPT incoming connections (server keeps waiting for them)
-    printf("Waiting for incoming connections...\n");
-    int stsize = sizeof(struct sockaddr);
-    SOCKET comm_socket = accept(conn_socket, (struct sockaddr*)&client, &stsize);
-	// Using comm_socket is able to send/receive data to/from connected client
-    if (comm_socket == INVALID_SOCKET) {
-        printf("accept failed with error code : %d", WSAGetLastError());
-        closesocket(conn_socket);
-        WSACleanup();
-        return;
-    }
-    printf("Incoming connection from: %s (%d)\n", inet_ntoa(client.sin_addr),
-           ntohs(client.sin_port));
-
-	// Closing the listening socket (is not going to be used anymore)
-    closesocket(conn_socket);
-
-	// RECEIVE and display data from clients
-    printf("Waiting for incoming messages from client... \n");
-    int bytes;
-    do {
-        bytes = recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-        if (bytes > 0) {
-            recvBuff[bytes] = '\0'; // Ensure null termination
-            printf("Received message from client: %s\n", recvBuff);
-        } else if (bytes == 0) {
-            printf("Client disconnected.\n");
-            break;
-        } else {
-            printf("recv error: %d\n", WSAGetLastError());
-            break;
-        }
-    } while (bytes > 0);
-
-	// CLOSING the socket and cleaning Winsock...
-    closesocket(comm_socket);
-    WSACleanup();
 }
