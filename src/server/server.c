@@ -175,18 +175,16 @@ void handle_main_menu_option(sqlite3* db, char choice) {
 void uci_loop2(SOCKET client_socket, Position* pos) {
     const int BUFFER_LEN = 2048;
     char input_buffer[BUFFER_LEN];
-    char output_buffer[BUFFER_LEN];
 
     // Enviar el mensaje de bienvenida al cliente
-    sprintf(output_buffer, "id CHESS-E\n");
-    send(client_socket, output_buffer, strlen(output_buffer), 0);
-    sprintf(output_buffer, "uciok\n");
-    send(client_socket, output_buffer, strlen(output_buffer), 0);
+    send(client_socket, "uciok\n", strlen("uciok\n"), 0);
 
     while (1) {
-        // Limpiar el buffer de entrada antes de cada lectura
-        memset(input_buffer, 0 , sizeof(input_buffer));
-        
+        print_position(*pos);
+
+        // Reset user input buffer
+        memset(input_buffer, 0, sizeof(input_buffer));
+
         // Esperar a recibir un mensaje del cliente
         int bytes_received = recv(client_socket, input_buffer, BUFFER_LEN, 0);
         if (bytes_received <= 0) {
@@ -194,34 +192,24 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
             break;
         }
 
-        // Procesar el comando recibido del cliente
+        // Parsear los comandos UCI recibidos del cliente
         if (strncmp(input_buffer, "isready", 7) == 0) {
-            // Preparado para recibir comandos
-            sprintf(output_buffer, "readyok\n");
-            send(client_socket, output_buffer, strlen(output_buffer), 0);
+            send(client_socket, "readyok\n", strlen("readyok\n"), 0);
         } else if (strncmp(input_buffer, "position", 8) == 0) {
-            // Procesar la posición recibida
             parse_position(pos, input_buffer);
+        } else if (strncmp(input_buffer, "ucinewgame", 10) == 0) {
+            parse_position(pos, "position startpos");
         } else if (strncmp(input_buffer, "go", 2) == 0) {
-            // Procesar el comando "go"
             parse_go(pos, input_buffer);
-            
-            // Aquí deberías llamar a la lógica del motor de ajedrez para obtener el mejor movimiento
-            // Por ahora, simplemente enviamos un movimiento de ejemplo
-            sprintf(output_buffer, "bestmove e2e4\n");
-            send(client_socket, output_buffer, strlen(output_buffer), 0);
         } else if (strncmp(input_buffer, "quit", 4) == 0) {
-            // Comando de salida, terminar el bucle
             break;
         } else if (strncmp(input_buffer, "uci", 3) == 0) {
-            // Comando UCI, responder con la identificación
-            sprintf(output_buffer, "id CHESS-E\n");
-            send(client_socket, output_buffer, strlen(output_buffer), 0);
-            sprintf(output_buffer, "uciok\n");
-            send(client_socket, output_buffer, strlen(output_buffer), 0);
+            send(client_socket, "id CHESS-E\n", strlen("id CHESS-E\n"), 0);
+            send(client_socket, "uciok\n", strlen("uciok\n"), 0);
         }
     }
 
     // Cerrar el socket del cliente al salir del bucle
     closesocket(client_socket);
 }
+
