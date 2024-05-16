@@ -1,3 +1,16 @@
+// CHESS INCLUDES
+#include "../chess/bitboard.h"
+#include "../chess/attack.h"
+#include "../chess/random.h"
+#include "../chess/movegen.h"
+#include "../chess/move.h"
+#include "../chess/makemove.h"
+#include "../chess/perftest.h"
+#include "../chess/uci.h"
+#include "../chess/eval.h"
+#include "../chess/search.h"
+// CHESS INCLUDES
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,5 +37,8 @@ void show_main_menu();
 
 // Handle user input in main menu
 void handle_main_menu_option(sqlite3* db, char choice);
+
+// Start uciloop (wait for an incoming move command)
+void uci_loop2(SOCKET client_socket, Position* pos);
 
 #endif // _SERVER_H

@@ -1,5 +1,7 @@
 #include "server_socket.h"
 
+#include "server.h"
+
 // Start the server (wait for connecting client)
 void start_server() {
 	WSADATA wsaData;
@@ -65,22 +67,13 @@ void start_server() {
 	// Close the listening socket (is not going to be used anymore)
     closesocket(conn_socket);
 
-	// RECEIVE and display data from clients
-    printf("Waiting for incoming messages from client... \n");
-    int bytes;
-    do {
-        bytes = recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-        if (bytes > 0) {
-            recvBuff[bytes] = '\0'; // Ensure null termination
-            printf("Received message from client: %s\n", recvBuff);
-        } else if (bytes == 0) {
-            printf("Client disconnected.\n");
-            break;
-        } else {
-            printf("recv error: %d\n", WSAGetLastError());
-            break;
-        }
-    } while (bytes > 0);
+	// Start uci loop for communication with the client
+    init_piece_attacks();
+
+    Position pos;
+    parse_fen(&pos, TRICKY_POSITION);
+
+    uci_loop2(comm_socket, &pos);
 
 	// CLOSE the socket and clean Winsock...
     closesocket(comm_socket);

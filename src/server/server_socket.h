@@ -1,3 +1,16 @@
+// CHESS INCLUDES
+#include "../chess/bitboard.h"
+#include "../chess/attack.h"
+#include "../chess/random.h"
+#include "../chess/movegen.h"
+#include "../chess/move.h"
+#include "../chess/makemove.h"
+#include "../chess/perftest.h"
+#include "../chess/uci.h"
+#include "../chess/eval.h"
+#include "../chess/search.h"
+// CHESS INCLUDES
+
 #include <stdio.h>
 #include <winsock2.h>
 

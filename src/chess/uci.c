@@ -164,6 +164,7 @@ void uci_loop(Position* pos) {
     printf("uciok\n");
 
     while (1) {
+        print_position(*pos);
 
         // Reset user input
         memset(input_buffer, 0 , sizeof(input_buffer));
