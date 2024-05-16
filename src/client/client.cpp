@@ -2,6 +2,7 @@
 
 // g++ src/client/client_main.cpp src/client/client_socket.cpp src/client/client_socket.h src/client/client.cpp src/client/client.h -lm -lws2_32 -o bin/client
 
+// Print main menu options
 void show_main_menu() {
     std::cout << "Main Menu" << std::endl;
     std::cout << "---------" << std::endl;
@@ -9,6 +10,7 @@ void show_main_menu() {
     std::cout << "q -> Quit" << std::endl;
 }
 
+// Handle different main menu options
 void handle_main_menu_option(char choice, SOCKET s) {
     switch (choice) {
         case 'p':

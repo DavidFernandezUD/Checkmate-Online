@@ -1,5 +1,6 @@
 #include "client_socket.h"
 
+// Connect to socket (when "client.exe" is executed)
 SOCKET connect_to_server() {
 	WSADATA wsaData;
 	SOCKET s;
@@ -10,7 +11,7 @@ SOCKET connect_to_server() {
         return INVALID_SOCKET;
     }
 
-	//SOCKET creation
+	// CREATE SOCKET
 	if ((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
         std::cerr << "Failed to create socket. Error Code: " << WSAGetLastError() << std::endl;
         WSACleanup();
@@ -21,7 +22,7 @@ SOCKET connect_to_server() {
     server.sin_family = AF_INET;
     server.sin_port = htons(SERVER_PORT);
 
-	//CONNECT to remote server
+	// CONNECT to remote server
 	 if (connect(s, (struct sockaddr*) &server, sizeof(server)) == SOCKET_ERROR) {
         std::cerr << "Failed to connect to server. Error Code: " << WSAGetLastError() << std::endl;
         closesocket(s);
@@ -34,6 +35,7 @@ SOCKET connect_to_server() {
 	return s;
 }
 
+// Send continuous messages to the server
 void send_messages(SOCKET s) {
     char message[512];
     std::cout << "Enter a message to send to the server ('q' to quit):" << std::endl;
