@@ -10,7 +10,10 @@
 // Connect to socket (when "client.exe" is executed)
 SOCKET connect_to_server();
 
-// Send continuous messages to the server
-void send_messages(SOCKET s);
+// Send continuous moves to the server
+void make_moves(SOCKET s);
+
+// Receive information from server and display it on the console
+void receive_and_print_information(SOCKET s);
 
 #endif // _CLIENT_SOCKET_H

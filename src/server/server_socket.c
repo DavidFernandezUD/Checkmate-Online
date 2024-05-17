@@ -10,13 +10,13 @@ void start_server() {
     struct sockaddr_in client;
     char recvBuff[512];
 
-	printf("\nInitialising Winsock...\n");
+	//printf("\nInitialising Winsock...\n");
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         printf("Failed. Error Code : %d", WSAGetLastError());
         return;
     }
 
-	printf("Initialised.\n");
+	//printf("Initialised.\n");
 
 	//SOCKET creation
 	if ((conn_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
@@ -25,7 +25,7 @@ void start_server() {
         return;
     }
 
-	printf("Socket created.\n");
+	//printf("Socket created.\n");
 
 	server.sin_addr.s_addr = INADDR_ANY;
     server.sin_family = AF_INET;
@@ -40,7 +40,7 @@ void start_server() {
         return;
     }
 
-	printf("Bind done.\n");
+	//printf("Bind done.\n");
 
 	// LISTEN to incoming connections (socket server moves to listening mode)
     if (listen(conn_socket, 1) == SOCKET_ERROR) {
@@ -61,7 +61,7 @@ void start_server() {
         WSACleanup();
         return;
     }
-    printf("Incoming connection from: %s (%d)\n", inet_ntoa(client.sin_addr),
+    printf("Incoming connection from: %s (%d)\n\n", inet_ntoa(client.sin_addr),
            ntohs(client.sin_port));
 
 	// Close the listening socket (is not going to be used anymore)

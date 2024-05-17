@@ -30,24 +30,54 @@ SOCKET connect_to_server() {
         return INVALID_SOCKET;
     }
 
-	 std::cout << "Connected to server: " << SERVER_IP << " (" << SERVER_PORT << ")" << std::endl;
+	 std::cout << "Connected to server: " << SERVER_IP << " (" << SERVER_PORT << ")" << std::endl << std::endl;
 
 	return s;
 }
 
-// Send continuous messages to the server
-void send_messages(SOCKET s) {
+// Send continuous moves to the server
+void make_moves(SOCKET s) {
     char message[512];
-    std::cout << "Enter a message to send to the server ('q' to quit):" << std::endl;
+    std::cout << "Enter a move to send to the server ('q' to quit):" << std::endl;
     while (true) {
         std::cin.getline(message, sizeof(message));
         if (strcmp(message, "q") == 0) {
-            break;
+            if (send(s, message, strlen(message), 0) == SOCKET_ERROR) {
+                std::cerr << "Send failed with error code : " << WSAGetLastError() << std::endl;
+                return;
+            }
+            std::cout << "Message sent: " << message << std::endl;
+            break; // Salir del bucle después de enviar 'q'
         }
         if (send(s, message, strlen(message), 0) == SOCKET_ERROR) {
             std::cerr << "Send failed with error code : " << WSAGetLastError() << std::endl;
             return;
         }
         std::cout << "Message sent: " << message << std::endl;
+
+        // After sending a move, receive and display server's information
+        receive_and_print_information(s);
     }
+}
+
+// Receive information from server and display it on the console
+void receive_and_print_information(SOCKET s) {
+    const int BUFFER_SIZE = 2048;
+    char buffer[BUFFER_SIZE];
+
+    // Receive information from the server
+    int bytes_received = recv(s, buffer, BUFFER_SIZE, 0);
+    if (bytes_received <= 0) {
+        // Manejar errores de recepción o cierre de conexión
+        if (bytes_received == 0) {
+            std::cerr << "Connection closed by server" << std::endl;
+        } else {
+            std::cerr << "Error in recv()" << std::endl;
+        }
+        return;
+    }
+
+    // Display received information
+    buffer[bytes_received] = '\0';
+    std::cout << "Received data from server: " << std::endl << buffer << std::endl;
 }

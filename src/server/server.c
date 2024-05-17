@@ -176,7 +176,7 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
     const int BUFFER_LEN = 2048;
     char input_buffer[BUFFER_LEN];
 
-    // Enviar el mensaje de bienvenida al cliente
+    // Send the welcome message to the client
     send(client_socket, "uciok\n", strlen("uciok\n"), 0);
 
     while (1) {
@@ -185,14 +185,14 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
         // Reset user input buffer
         memset(input_buffer, 0, sizeof(input_buffer));
 
-        // Esperar a recibir un mensaje del cliente
+        // Wait to receive a message from the client
         int bytes_received = recv(client_socket, input_buffer, BUFFER_LEN, 0);
         if (bytes_received <= 0) {
-            // Manejar errores de recepción o cierre de conexión
+            // Handle reception or connection closure errors
             break;
         }
 
-        // Parsear los comandos UCI recibidos del cliente
+        // Parse UCI commands received from the client
         if (strncmp(input_buffer, "isready", 7) == 0) {
             send(client_socket, "readyok\n", strlen("readyok\n"), 0);
         } else if (strncmp(input_buffer, "position", 8) == 0) {
@@ -207,9 +207,49 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
             send(client_socket, "id CHESS-E\n", strlen("id CHESS-E\n"), 0);
             send(client_socket, "uciok\n", strlen("uciok\n"), 0);
         }
+
+        send_position_to_client(client_socket, *pos);
     }
 
-    // Cerrar el socket del cliente al salir del bucle
+    // Close client socket on loop exit
     closesocket(client_socket);
 }
 
+// Send chessboard status to client
+void send_position_to_client(SOCKET client_socket, Position position) {
+    char position_buffer[2048]; // Buffer size for storing the position
+
+    // Construct the position string in the buffer
+    int offset = 0;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            int square = i * 8 + j;
+
+            int piece = -1;
+            for (int i = 0; i < 12; i++) {
+                if (GET_BIT(position.bitboards[i], square)) {
+                    piece = i;
+                }
+            }
+
+            char piece_char = (piece == -1) ? '.' : ASCII_PIECES[piece];
+            position_buffer[offset++] = piece_char;
+        }
+        position_buffer[offset++] = '\n';
+    }
+
+    // Add additional information to the buffer (turn, castling, enpassant)
+    snprintf(position_buffer + offset, sizeof(position_buffer) - offset,
+             "\nTurn:      %s\n"
+             "Castling:  %c%c%c%c\n"
+             "Enpassant: %s\n\n",
+             (position.turn == WHITE) ? "white" : "black",
+             (position.castling & WK) ? 'K' : '-',
+             (position.castling & WQ) ? 'Q' : '-',
+             (position.castling & BK) ? 'k' : '-',
+             (position.castling & BQ) ? 'q' : '-',
+             (position.enpassant != NULL_SQUARE) ? square_to_coordinates[position.enpassant] : "no");
+
+    // Send the position to the customer via the socket
+    send(client_socket, position_buffer, strlen(position_buffer), 0);
+}

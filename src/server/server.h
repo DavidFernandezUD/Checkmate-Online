@@ -41,4 +41,7 @@ void handle_main_menu_option(sqlite3* db, char choice);
 // Start uciloop (wait for an incoming move command)
 void uci_loop2(SOCKET client_socket, Position* pos);
 
+// Send chessboard status to client
+void send_position_to_client(SOCKET client_socket, Position position);
+
 #endif // _SERVER_H
