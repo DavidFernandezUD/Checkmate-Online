@@ -45,4 +45,9 @@ int delete_rows(sqlite3* db, const char* table, const char* condition);
 // Update parameters of the USERS table
 int update_user_parameter(sqlite3* db, int user_id, const char* parameter, const char* new_value);
 
+// Save a new match
+int save_match(sqlite3* db, const char* date, int black_user_id, int white_user_id, const char* match_type);
+// Save a new move
+int save_movement(sqlite3* db, int match_id, const char* movement);
+
 #endif // _DATABASE_H

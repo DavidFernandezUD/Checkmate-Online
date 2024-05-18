@@ -7,6 +7,7 @@ void show_main_menu() {
     std::cout << "Main Menu" << std::endl;
     std::cout << "---------" << std::endl;
     std::cout << "p -> Play" << std::endl;
+    std::cout << "s -> Statistics" << std::endl;
     std::cout << "q -> Quit" << std::endl;
 }
 
@@ -16,6 +17,14 @@ void handle_main_menu_option(char choice, SOCKET s) {
         case 'p':
             if (s != INVALID_SOCKET) {
                 make_moves(s);
+            } else {
+                std::cerr << "Not connected to the server. Please connect first." << std::endl;
+            }
+            break;
+
+        case 's':
+            if (s != INVALID_SOCKET) {
+                //request_user_statistics(s);
             } else {
                 std::cerr << "Not connected to the server. Please connect first." << std::endl;
             }

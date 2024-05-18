@@ -316,3 +316,109 @@ int delete_rows(sqlite3* db, const char* table, const char* condition) {
     }
     return 0;
 }
+
+// Save a new match
+int save_match(sqlite3* db, const char* date, int black_user_id, int white_user_id, const char* match_type) {
+    
+    // Check if the match already exists in the database
+    char select_query[512];
+    sprintf(select_query, "SELECT COUNT(*) FROM MATCHES WHERE date='%s' AND black_user_id=%d AND white_user_id=%d;",
+            date, black_user_id, white_user_id);
+
+    sqlite3_stmt* stmt;
+    int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
+        return 1;
+    }
+
+    // Execute the selection query
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        count = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+
+    // If the match already exists, return an error
+    if (count > 0) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Match already exists in the database.\n");
+        return 1;
+    }
+
+    // Insert the match into the database
+    char insert_query[512];
+    sprintf(insert_query, "INSERT INTO MATCHES (date, black_user_id, white_user_id, match_type) "
+                          "VALUES ('%s', %d, %d, '%s');",
+                          date, black_user_id, white_user_id, match_type);
+
+    rc = sqlite3_exec(db, insert_query, 0, 0, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed inserting data into MATCHES table: %s\n", sqlite3_errmsg(db));
+        return 1;
+    }
+
+    return 0;
+}
+
+// Save a new movement
+int save_movement(sqlite3* db, int match_id, const char* movement) {
+    // Insert the movement into the database
+    char insert_query[512];
+    sprintf(insert_query, "INSERT INTO MOVEMENTS (match_id, movement) "
+                          "VALUES (%d, '%s');",
+                          match_id, movement);
+
+    int rc = sqlite3_exec(db, insert_query, 0, 0, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed inserting data into MOVEMENTS table: %s\n", sqlite3_errmsg(db));
+        return 1;
+    }
+
+    return 0;
+}
+
+// Show statistics of current user
+void show_user_statistics(sqlite3* db, const char* username) {
+    // Build the select query
+    char select_query[512];
+    sprintf(select_query, "SELECT * FROM USERS WHERE username='%s';", username);
+
+    sqlite3_stmt* stmt;
+    int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    printf("\n\e[1;97mUser Statistics:\e[0m\n");
+    printf(
+        "+----+----------+------------+------+---------------+---------+-----------------+-----------------+\n"
+        "| ID | Username |  Password  | ELO  | Creation Date | Winrate | Winrate (white) | Winrate (black) |\n"
+        "+----+----------+------------+------+---------------+---------+-----------------+-----------------+\n"
+    );
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        int user_id = sqlite3_column_int(stmt, 0);
+        const unsigned char* username = sqlite3_column_text(stmt, 1);
+        const unsigned char* password = sqlite3_column_text(stmt, 2);
+        int elo = sqlite3_column_int(stmt, 3);
+        const unsigned char* creation_date = sqlite3_column_text(stmt, 4);
+        double winrate = sqlite3_column_double(stmt, 5);
+        double winrate_white = sqlite3_column_double(stmt, 6);
+        double winrate_black = sqlite3_column_double(stmt, 7);
+
+        printf(
+            "| %-2d | %-8s | %-10s | %d |  %s   |  %.2f   |      %.2f       |      %.2f       |\n",
+            user_id,
+            username,
+            password,
+            elo,
+            creation_date,
+            winrate,
+            winrate_white,
+            winrate_black
+        );
+    }
+    printf("+----+----------+------------+------+---------------+---------+-----------------+-----------------+\n\n");
+    sqlite3_finalize(stmt);
+}

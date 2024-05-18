@@ -81,3 +81,8 @@ void receive_and_print_information(SOCKET s) {
     buffer[bytes_received] = '\0';
     std::cout << "Received data from server: " << std::endl << buffer << std::endl;
 }
+
+// Request user statistics from server
+void request_user_statistics(SOCKET s, const char* username) {
+
+}
