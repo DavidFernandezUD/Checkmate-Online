@@ -246,9 +246,9 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
         send(client_socket, "You play as WHITE\n", 19, 0);
     }
 
-    while (1) {
+    send_position_to_client(client_socket, *pos);
 
-        send_position_to_client(client_socket, *pos);
+    while (1) {
 
         // Reset user input buffer
         memset(input_buffer, 0, sizeof(input_buffer));
@@ -305,25 +305,32 @@ void send_position_to_client(SOCKET client_socket, Position position) {
     // Construct the position string in the buffer
     int offset = 0;
     for (int i = 0; i < 8; i++) {
+        // Add row number at the beginning of each line
+        offset += snprintf(position_buffer + offset, sizeof(position_buffer) - offset, " %d ", 8 - i);
+        
         for (int j = 0; j < 8; j++) {
             int square = i * 8 + j;
 
             int piece = -1;
-            for (int i = 0; i < 12; i++) {
-                if (GET_BIT(position.bitboards[i], square)) {
-                    piece = i;
+            for (int k = 0; k < 12; k++) {
+                if (GET_BIT(position.bitboards[k], square)) {
+                    piece = k;
+                    break;  // Stop once the piece is found
                 }
             }
 
             char piece_char = (piece == -1) ? '.' : ASCII_PIECES[piece];
-            position_buffer[offset++] = piece_char;
+            offset += snprintf(position_buffer + offset, sizeof(position_buffer) - offset, " %c", piece_char);
         }
         position_buffer[offset++] = '\n';
     }
 
+    // Add column labels
+    offset += snprintf(position_buffer + offset, sizeof(position_buffer) - offset, "\n    a b c d e f g h\n\n");
+
     // Add additional information to the buffer (turn, castling, enpassant)
     snprintf(position_buffer + offset, sizeof(position_buffer) - offset,
-             "\nTurn:      %s\n"
+             "Turn:      %s\n"
              "Castling:  %c%c%c%c\n"
              "Enpassant: %s\n\n",
              (position.turn == WHITE) ? "white" : "black",
@@ -333,6 +340,6 @@ void send_position_to_client(SOCKET client_socket, Position position) {
              (position.castling & BQ) ? 'q' : '-',
              (position.enpassant != NULL_SQUARE) ? square_to_coordinates[position.enpassant] : "no");
 
-    // Send the position to the customer via the socket
+    // Send the position to the client via the socket
     send(client_socket, position_buffer, strlen(position_buffer), 0);
 }

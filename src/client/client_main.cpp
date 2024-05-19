@@ -6,6 +6,17 @@ int main() {
         return 1;
     }
 
+    User user;
+    std::string username;
+
+    std::cout << "Enter your username: ";
+    std::cin >> username;
+
+    user.setUsername(username);
+
+    std::cout << std::endl << "Welcome to Checkmate Online, " << user.getUsername() << "!" << std::endl << std::endl;
+
+
     char choice;
 
     // Main menu

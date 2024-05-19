@@ -63,9 +63,20 @@ void start_server() {
     // Initialize attack tables for chess engine
     init_piece_attacks();
 
-    // Start uci loop
-    Position pos;
-    uci_loop2(comm_socket, &pos);
+    // Wait for "play" command from client
+    int bytes_received = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
+    if (bytes_received > 0) {
+        recvBuff[bytes_received] = '\0'; // Null-terminate the buffer
+        if (strcmp(recvBuff, "play") == 0) {
+            // Start uci loop
+            Position pos;
+            uci_loop2(comm_socket, &pos);
+        } else {
+            printf("Unexpected command received: %s\n", recvBuff);
+        }
+    } else {
+        printf("Failed to receive data from client.\n");
+    }
 
 	// CLOSE the socket and clean Winsock...
     closesocket(comm_socket);
