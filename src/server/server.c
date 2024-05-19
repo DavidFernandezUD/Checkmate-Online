@@ -215,16 +215,9 @@ void makeEngineMove(Position* pos, char* moves, int depth, unsigned int* n_move)
 
 // Start uciloop (wait for an incoming move command)
 void uci_loop2(SOCKET client_socket, Position* pos) {
-    
-    printf("In uci loop!\n");
 
     const int BUFFER_LEN = 2048;
     char input_buffer[BUFFER_LEN];
-
-    // Send the welcome message to the client
-    send(client_socket, "uciok\n", strlen("uciok\n"), 0);
-
-    printf("Sent welcome message\n");
 
     // Initialize game
     unsigned int n_move;
@@ -235,22 +228,27 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
     strcpy(moves, "position startpos");
     parse_position(pos, moves);
     
+    // Randomize player color
     srand(time(NULL));
     playerColor = (rand() % 2 == 0) ? WHITE : BLACK;
 
     strcat(moves, " moves ");
 
     if (playerColor == BLACK) {
+        
+        // Engine does first move
         makeEngineMove(pos, moves, 6, &n_move);
-        print_position(*pos);
+
+        // Send color to player
+        send(client_socket, "You play as BLACK\n", 19, 0);
+    } else {
+        // Send color to player
+        send(client_socket, "You play as WHITE\n", 19, 0);
     }
 
-    printf("%s\n", moves);
-    printf("Randomized player color = %s\n", (playerColor == WHITE) ? "White" : "Black");
-
     while (1) {
-        
-        printf("In while!\n");
+
+        send_position_to_client(client_socket, *pos);
 
         // Reset user input buffer
         memset(input_buffer, 0, sizeof(input_buffer));
@@ -264,19 +262,31 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
 
         // Parse UCI commands received from the client
         if (makePlayerMove(pos, moves, input_buffer, &n_move) == ERR_ILEGAL_MOVE) {
-            // TODO: Send player message to retry
+            send(client_socket, "Ilegal move, try again!\n", 25, 0);
             continue;
         }
         print_position(*(pos));
 
-        // TODO: Check that player hasn't won
-        if (1) {
+        MoveList list;
+
+        // Check that the player hasn't won
+        generate_moves(pos, &list);
+        if (list.top != 0) {
+
             // Engine makes move after player
             makeEngineMove(pos, moves, 6, &n_move);
-        }
+        
+            // Check that engine hasn't won the game
+            generate_moves(pos, &list);
+            if (list.top == 0) {
+                // TODO: Save stats
+                send(client_socket, "Engine won!\n", 13, 0);
+                break;
+            }
 
-        // TODO: Check that engine hasn't won the game
-        if (0) {
+        } else {
+            // TODO: Save stats
+            send(client_socket, "Player won!\n", 13, 0);
             break;
         }
 
