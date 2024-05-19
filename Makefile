@@ -12,10 +12,9 @@ else
 endif
 
 # Directories
-SRC_DIR  = src
-BIN_DIR  = bin
-TEST_DIR = test
-LIB_DIR  = lib
+SRC_DIR = src
+BIN_DIR = bin
+LIB_DIR = lib
 
 # Targets
 all: chess server
@@ -24,7 +23,7 @@ all: chess server
 # Chess
 chess: $(BIN_DIR)/chess
 
-$(BIN_DIR)/chess: $(wildcard $(SRC_DIR)/chess/*.c) $(SRC_DIR)/main.c
+$(BIN_DIR)/chess: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
 	$(CC) $(CFLAGS) $^ -lm -o $@
 
 
@@ -35,20 +34,15 @@ $(BIN_DIR)/chess_profile: $(SRC_DIR)/main.c $(wildcard $(SRC_DIR)/chess/*.c)
 	$(CC) $(CFLAGS) $^ -lm -pg -o $@
 
 
-# Tests
-test: $(BIN_DIR)/test
-
-$(BIN_DIR)/test: $(TEST_DIR)/test_movegen.c $(wildcard $(SRC_DIR)/chess/*.c)
-	$(CC) $(CFLAGS) $^ -o $@
-
-	./$(BIN_DIR)/test
-
-
 # Server
 server: $(BIN_DIR)/server
 
-$(BIN_DIR)/server: $(SRC_DIR)/server/server_main.c $(wildcard $(SRC_DIR)/server/*.c) $(LIB_DIR)/sqlite/sqlite3.c
+$(BIN_DIR)/server: $(SRC_DIR)/server/server_main.c $(wildcard $(SRC_DIR)/server/*.c) $(LIB_DIR)/sqlite/sqlite3.o
 	$(CC) $^ -lm -o $@
+
+# Compile SQLite object file
+$(LIB_DIR)/sqlite/sqlite3.o: $(wildcard $(LIB_DIR)/sqlite/sqlite3.c)
+	$(CC) -c $^ -o $@ -I$(LIB_DIR)/sqlite
 
 
 # Clean

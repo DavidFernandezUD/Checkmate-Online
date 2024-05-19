@@ -31,28 +31,6 @@
 #ifndef _SERVER_H
 #define _SERVER_H
 
-class Game {
-
-private:
-
-    unsigned int n_move;
-    char moves[2048];
-    Position* pos;
-    Color playerColor;
-
-public:
-
-    Game(Position& pos)
-
-    Color getPlayerColor();
-
-    unsigned int getMove();
-
-    int makeMove(char* move);
-
-    void makeEngineMove(Position* pos, int depth);
-};
-
 // Request admin credentials in the console
 void requestCredentials(int* credentialsValid);
 

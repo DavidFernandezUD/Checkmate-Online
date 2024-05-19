@@ -1,7 +1,7 @@
 #include <string.h>
 #include "server.h"
 #include "../chess/uci.h"
-// g++ src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
+// gcc src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
 
 // TODO: Improve config file
 
@@ -98,7 +98,6 @@ void update_user(sqlite3* db) {
     }
 }
 
-int
 // Delete selected user from the database
 void remove_user(sqlite3* db) {
     printf("Enter the ID of the user you want to delete: ");
@@ -171,47 +170,27 @@ void handle_main_menu_option(sqlite3* db, char choice) {
     }
 }
 
+int makePlayerMove(Position* pos, char* moves, char* move, unsigned int* n_move) {
 
-Game::Game(Position& pos) {
-
-    this->pos = pos;
-    
-    n_move = 0;
-    strcpy(moves, "position startpos moves ");
-
-    parse_fen(&pos, moves);
-    
-    playerColor = (((float) rand() / RAND_MAX) > 0.5) WHITE : BLACK;
-}
-
-Color Game::getPlayerColor() {
-    return playerColor;
-}
-
-unsigned int Game::getMove() {
-    return n_move;
-}
-
-int Game::makeMove(char* move) {
-
-    char* temp_moves = new char[2048];
+    char* temp_moves = (char*) malloc(2048 * sizeof(char));
 
     strcpy(temp_moves, moves);
 
     strcat(temp_moves, move);
     strcat(temp_moves, " ");
 
-    if (parse_position(this->pos, temp_moves) == 0) {
+    if (parse_position(pos, temp_moves) == 0) {
         strcpy(moves, temp_moves);
-        n_move++;
+        free(temp_moves);
+        (*n_move)++;
         return 0;
     }
 
-    delete[] temp_moves;
+    free(temp_moves);
     return ERR_ILEGAL_MOVE;
 }
 
-void Game::makeEngineMove(Position* pos, int depth) {
+void makeEngineMove(Position* pos, char* moves, int depth, unsigned int* n_move) {
 
     int best_move;
     int half_moves = 0;
@@ -221,7 +200,7 @@ void Game::makeEngineMove(Position* pos, int depth) {
 
     char engine_move[16];
     if (GET_MOVE_PROMOTION(best_move)) {
-        sprintf(engine_move, "%s%s%c", square_to_coordinates[GET_MOVE_SRC(best_move)], square_to_coordinates[GET_MOVE_DST(best_move)], ASCII_PIECES[GET_MOVE_PROMOTION(move)]);
+        sprintf(engine_move, "%s%s%c", square_to_coordinates[GET_MOVE_SRC(best_move)], square_to_coordinates[GET_MOVE_DST(best_move)], ASCII_PIECES[GET_MOVE_PROMOTION(best_move)]);
     } else {
         sprintf(engine_move, "%s%s", square_to_coordinates[GET_MOVE_SRC(best_move)], square_to_coordinates[GET_MOVE_DST(best_move)]);
     }
@@ -229,21 +208,39 @@ void Game::makeEngineMove(Position* pos, int depth) {
     strcat(moves, engine_move);
     strcat(moves, " ");
 
-    parse_position(this->pos, moves);
-    n_move++;
+    parse_position(pos, moves);
+    (*n_move)++;
 }
 
 // Start uciloop (wait for an incoming move command)
-void uci_loop2(SOCKET client_socket, Game* game) {
+void uci_loop2(SOCKET client_socket, Position* pos) {
+    
     const int BUFFER_LEN = 2048;
     char input_buffer[BUFFER_LEN];
 
     // Send the welcome message to the client
     send(client_socket, "uciok\n", strlen("uciok\n"), 0);
 
+    // Initialize game
+    unsigned int n_move;
+    char moves[2048];
+    Color playerColor;
+
+    n_move = 0;
+    strcpy(moves, "position startpos moves ");
+    parse_fen(pos, moves);
+    
+    printf("%s\n", moves);
+
+    playerColor = (((float) rand() / RAND_MAX) > 0.5) ? WHITE : BLACK;
+
+    if (playerColor == BLACK) {
+        makeEngineMove(pos, moves, 6, &n_move);
+        print_position(*pos);
+    }
+
     while (1) {
         
-
         // Reset user input buffer
         memset(input_buffer, 0, sizeof(input_buffer));
 
@@ -254,22 +251,17 @@ void uci_loop2(SOCKET client_socket, Game* game) {
             break;
         }
 
-        if (game->getMove() == 0 && game->getPlayerColor() == BLACK) {
-            game->makeEngineMove(pos, 6);
-            print_position(*pos);
-        }
-
         // Parse UCI commands received from the client
-        if (game->makeMove(input_buffer) == ERR_ILEGAL_MOVE) {
+        if (makePlayerMove(pos, moves, input_buffer, &n_move) == ERR_ILEGAL_MOVE) {
             // TODO: Send player message to retry
             continue;
         }
-        print_position(*pos);
+        print_position(*(pos));
 
         // TODO: Check that player hasn't won
         if (1) {
             // Engine makes move after player
-            game->makeEngineMove(pos, 6);
+            makeEngineMove(pos, moves, 6, &n_move);
         }
 
         // TODO: Check that engine hasn't won the game

@@ -69,10 +69,9 @@ void start_server() {
 	// Start uci loop for communication with the client
     init_piece_attacks();
 
+    // Start uci loop
     Position pos;
-    Game game(pos);
-
-    uci_loop2(comm_socket, &game);
+    uci_loop2(comm_socket, &pos);
 
 	// CLOSE the socket and clean Winsock...
     closesocket(comm_socket);
