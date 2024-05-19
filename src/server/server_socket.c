@@ -1,5 +1,4 @@
 #include "server_socket.h"
-
 #include "server.h"
 
 // Start the server (wait for connecting client)
@@ -71,9 +70,9 @@ void start_server() {
     init_piece_attacks();
 
     Position pos;
-    parse_fen(&pos, TRICKY_POSITION);
+    Game game(pos);
 
-    uci_loop2(comm_socket, &pos);
+    uci_loop2(comm_socket, &game);
 
 	// CLOSE the socket and clean Winsock...
     closesocket(comm_socket);

@@ -26,8 +26,32 @@
 #define MAX_PARAMETER_LENGTH 10
 #define MAX_VALUE_LENGTH 100
 
+#define ERR_ILEGAL_MOVE 1
+
 #ifndef _SERVER_H
 #define _SERVER_H
+
+class Game {
+
+private:
+
+    unsigned int n_move;
+    char moves[2048];
+    Position* pos;
+    Color playerColor;
+
+public:
+
+    Game(Position& pos)
+
+    Color getPlayerColor();
+
+    unsigned int getMove();
+
+    int makeMove(char* move);
+
+    void makeEngineMove(Position* pos, int depth);
+};
 
 // Request admin credentials in the console
 void requestCredentials(int* credentialsValid);

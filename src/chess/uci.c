@@ -58,7 +58,7 @@ int parse_move(Position* pos, const char* move_string) {
 }
 
 
-void parse_position(Position* pos, const char* uci_command) {
+int parse_position(Position* pos, const char* uci_command) {
 
     // Skip the "position " command keyword
     if (strlen(uci_command) > 9) {
@@ -66,7 +66,7 @@ void parse_position(Position* pos, const char* uci_command) {
     } else {
         // TODO: Handle errors better
         fprintf(stderr, "\e[0;33m[WARNING]\e[0m Invalid position command passed to parse_position\n");
-        return;
+        return 1;
     }
 
     const char* current = uci_command;
@@ -91,7 +91,7 @@ void parse_position(Position* pos, const char* uci_command) {
             
             // TODO: Handle errors better
             fprintf(stderr, "\e[0;33m[WARNING]\e[0m Invalid position passed to parse_position\n");
-            return;
+            return 1;
         }
     }
 
@@ -113,7 +113,7 @@ void parse_position(Position* pos, const char* uci_command) {
                 
                 // TODO: Handle errors better
                 fprintf(stderr, "\e[0;33m[WARNING]\e[0m Ilegal move in parse_position\n");
-                return;
+                return 1;
             }
 
             // Move pointer to next move
@@ -125,6 +125,8 @@ void parse_position(Position* pos, const char* uci_command) {
             }
         }
     }
+
+    return 0;
 }
 
 

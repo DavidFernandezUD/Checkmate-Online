@@ -1,7 +1,7 @@
+#include <string.h>
 #include "server.h"
-
 #include "../chess/uci.h"
-// gcc src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
+// g++ src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
 
 // TODO: Improve config file
 
@@ -98,7 +98,7 @@ void update_user(sqlite3* db) {
     }
 }
 
-
+int
 // Delete selected user from the database
 void remove_user(sqlite3* db) {
     printf("Enter the ID of the user you want to delete: ");
@@ -171,8 +171,70 @@ void handle_main_menu_option(sqlite3* db, char choice) {
     }
 }
 
+
+Game::Game(Position& pos) {
+
+    this->pos = pos;
+    
+    n_move = 0;
+    strcpy(moves, "position startpos moves ");
+
+    parse_fen(&pos, moves);
+    
+    playerColor = (((float) rand() / RAND_MAX) > 0.5) WHITE : BLACK;
+}
+
+Color Game::getPlayerColor() {
+    return playerColor;
+}
+
+unsigned int Game::getMove() {
+    return n_move;
+}
+
+int Game::makeMove(char* move) {
+
+    char* temp_moves = new char[2048];
+
+    strcpy(temp_moves, moves);
+
+    strcat(temp_moves, move);
+    strcat(temp_moves, " ");
+
+    if (parse_position(this->pos, temp_moves) == 0) {
+        strcpy(moves, temp_moves);
+        n_move++;
+        return 0;
+    }
+
+    delete[] temp_moves;
+    return ERR_ILEGAL_MOVE;
+}
+
+void Game::makeEngineMove(Position* pos, int depth) {
+
+    int best_move;
+    int half_moves = 0;
+    int nodes = 0;
+
+    int score = negmax(pos, depth, -99999, 99999, &half_moves, &nodes, &best_move);
+
+    char engine_move[16];
+    if (GET_MOVE_PROMOTION(best_move)) {
+        sprintf(engine_move, "%s%s%c", square_to_coordinates[GET_MOVE_SRC(best_move)], square_to_coordinates[GET_MOVE_DST(best_move)], ASCII_PIECES[GET_MOVE_PROMOTION(move)]);
+    } else {
+        sprintf(engine_move, "%s%s", square_to_coordinates[GET_MOVE_SRC(best_move)], square_to_coordinates[GET_MOVE_DST(best_move)]);
+    }
+    
+    strcat(moves, engine_move);
+    strcat(moves, " ");
+
+    parse_position(this->pos, moves);
+    n_move++;
+}
+
 // Start uciloop (wait for an incoming move command)
-void uci_loop2(SOCKET client_socket, Position* pos) {
+void uci_loop2(SOCKET client_socket, Game* game) {
     const int BUFFER_LEN = 2048;
     char input_buffer[BUFFER_LEN];
 
@@ -180,7 +242,7 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
     send(client_socket, "uciok\n", strlen("uciok\n"), 0);
 
     while (1) {
-        print_position(*pos);
+        
 
         // Reset user input buffer
         memset(input_buffer, 0, sizeof(input_buffer));
@@ -192,20 +254,27 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
             break;
         }
 
+        if (game->getMove() == 0 && game->getPlayerColor() == BLACK) {
+            game->makeEngineMove(pos, 6);
+            print_position(*pos);
+        }
+
         // Parse UCI commands received from the client
-        if (strncmp(input_buffer, "isready", 7) == 0) {
-            send(client_socket, "readyok\n", strlen("readyok\n"), 0);
-        } else if (strncmp(input_buffer, "position", 8) == 0) {
-            parse_position(pos, input_buffer);
-        } else if (strncmp(input_buffer, "ucinewgame", 10) == 0) {
-            parse_position(pos, "position startpos");
-        } else if (strncmp(input_buffer, "go", 2) == 0) {
-            parse_go(pos, input_buffer);
-        } else if (strncmp(input_buffer, "quit", 4) == 0) {
+        if (game->makeMove(input_buffer) == ERR_ILEGAL_MOVE) {
+            // TODO: Send player message to retry
+            continue;
+        }
+        print_position(*pos);
+
+        // TODO: Check that player hasn't won
+        if (1) {
+            // Engine makes move after player
+            game->makeEngineMove(pos, 6);
+        }
+
+        // TODO: Check that engine hasn't won the game
+        if (0) {
             break;
-        } else if (strncmp(input_buffer, "uci", 3) == 0) {
-            send(client_socket, "id CHESS-E\n", strlen("id CHESS-E\n"), 0);
-            send(client_socket, "uciok\n", strlen("uciok\n"), 0);
         }
 
         send_position_to_client(client_socket, *pos);
@@ -214,6 +283,7 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
     // Close client socket on loop exit
     closesocket(client_socket);
 }
+
 
 // Send chessboard status to client
 void send_position_to_client(SOCKET client_socket, Position position) {
