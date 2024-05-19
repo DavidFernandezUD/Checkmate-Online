@@ -9,22 +9,18 @@ void start_server() {
     struct sockaddr_in client;
     char recvBuff[512];
 
-	//printf("\nInitialising Winsock...\n");
+	//cprintf("\nInitialising Winsock...\n");
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         printf("Failed. Error Code : %d", WSAGetLastError());
         return;
     }
 
-	//printf("Initialised.\n");
-
-	//SOCKET creation
+	//cSOCKET creation
 	if ((conn_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
         printf("Could not create socket : %d", WSAGetLastError());
         WSACleanup();
         return;
     }
-
-	//printf("Socket created.\n");
 
 	server.sin_addr.s_addr = INADDR_ANY;
     server.sin_family = AF_INET;
@@ -38,8 +34,6 @@ void start_server() {
         WSACleanup();
         return;
     }
-
-	//printf("Bind done.\n");
 
 	// LISTEN to incoming connections (socket server moves to listening mode)
     if (listen(conn_socket, 1) == SOCKET_ERROR) {
@@ -66,7 +60,7 @@ void start_server() {
 	// Close the listening socket (is not going to be used anymore)
     closesocket(conn_socket);
 
-	// Start uci loop for communication with the client
+    // Initialize attack tables for chess engine
     init_piece_attacks();
 
     // Start uci loop

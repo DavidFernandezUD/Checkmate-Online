@@ -1,4 +1,5 @@
 #include <string.h>
+#include <time.h>
 #include "server.h"
 #include "../chess/uci.h"
 // gcc src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
@@ -215,11 +216,15 @@ void makeEngineMove(Position* pos, char* moves, int depth, unsigned int* n_move)
 // Start uciloop (wait for an incoming move command)
 void uci_loop2(SOCKET client_socket, Position* pos) {
     
+    printf("In uci loop!\n");
+
     const int BUFFER_LEN = 2048;
     char input_buffer[BUFFER_LEN];
 
     // Send the welcome message to the client
     send(client_socket, "uciok\n", strlen("uciok\n"), 0);
+
+    printf("Sent welcome message\n");
 
     // Initialize game
     unsigned int n_move;
@@ -227,20 +232,26 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
     Color playerColor;
 
     n_move = 0;
-    strcpy(moves, "position startpos moves ");
-    parse_fen(pos, moves);
+    strcpy(moves, "position startpos");
+    parse_position(pos, moves);
     
-    printf("%s\n", moves);
+    srand(time(NULL));
+    playerColor = (rand() % 2 == 0) ? WHITE : BLACK;
 
-    playerColor = (((float) rand() / RAND_MAX) > 0.5) ? WHITE : BLACK;
+    strcat(moves, " moves ");
 
     if (playerColor == BLACK) {
         makeEngineMove(pos, moves, 6, &n_move);
         print_position(*pos);
     }
 
+    printf("%s\n", moves);
+    printf("Randomized player color = %s\n", (playerColor == WHITE) ? "White" : "Black");
+
     while (1) {
         
+        printf("In while!\n");
+
         // Reset user input buffer
         memset(input_buffer, 0, sizeof(input_buffer));
 
