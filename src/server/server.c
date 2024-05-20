@@ -231,7 +231,7 @@ void makeEngineMove(Position* pos, char* moves, int depth, unsigned int* n_move)
 }
 
 // Start uciloop (wait for an incoming move command)
-void uci_loop2(SOCKET client_socket, Position* pos) {
+void uci_loop2(SOCKET client_socket, sqlite3* db, const char* username, Position* pos)  {
 
     const int BUFFER_LEN = 2048;
     char input_buffer[BUFFER_LEN];
@@ -296,14 +296,19 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
             // Check that engine hasn't won the game
             generate_moves(pos, &list);
             if (list.top == 0) {
-                // TODO: Save stats
+                int user_id = get_user_id(db, username);
+                increment_matches(db, username);
                 send(client_socket, "Engine won!\n", 13, 0);
+                save_match(db, user_id, "BOT");
                 break;
             }
 
         } else {
-            // TODO: Save stats
+            int user_id = get_user_id(db, username);
+            increment_matches(db, username); // Incrementa partidas jugadas
+            increment_wins(db, username); 
             send(client_socket, "Player won!\n", 13, 0);
+            save_match(db, user_id, "PLAYER");
             break;
         }
 
@@ -313,7 +318,6 @@ void uci_loop2(SOCKET client_socket, Position* pos) {
     // Close client socket on loop exit
     closesocket(client_socket);
 }
-
 
 // Send chessboard status to client
 void send_position_to_client(SOCKET client_socket, Position position) {

@@ -166,14 +166,22 @@ int initialize_db(sqlite3** db) {
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed creating table USERS: %s\n", sqlite3_errmsg(*db));
         return 1;
     }
+
+
     load_users(*db, users, n_users);
+
+
     // MATCHES TABLE
     rc = sqlite3_exec(*db, create_matches_table, 0, 0, 0);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed creating table MATCHES: %s\n", sqlite3_errmsg(*db));
         return 1;
     }
+
+
     load_matches(*db, matches, n_matches);
+
+
     // MOVEMENTS TABLE
     rc = sqlite3_exec(*db, create_movements_table, 0, 0, 0);
     if (rc != SQLITE_OK) {
@@ -306,7 +314,6 @@ int update_user_parameter(sqlite3* db, int user_id, const char* parameter, const
     return 0;
 }
 
-
 int user_exists(sqlite3* db, int user_id) {
     char select_query[512];
     sprintf(select_query, "SELECT COUNT(*) FROM USERS WHERE user_id=%d;", user_id);
@@ -344,48 +351,26 @@ int delete_rows(sqlite3* db, const char* table, const char* condition) {
 }
 
 // Save a new match
-int save_match(sqlite3* db, const char* date, int user_id, const char* winner) {
-    
-    // Comprobar si el partido ya existe en la base de datos
-    char select_query[512];
-    sprintf(select_query, "SELECT COUNT(*) FROM MATCHES WHERE date='%s' AND user_id=%d;", date, user_id);
-
+void save_match(sqlite3* db, int user_id, const char* winner) {
+    char* sql = "INSERT INTO MATCHES (user_id, winner) VALUES (?, ?)";
     sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
+
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
-        return 1;
+        fprintf(stderr, "Error preparing statement: %s\n", sqlite3_errmsg(db));
+        return;
     }
 
-    // Ejecutar la consulta de selección
-    int count = 0;
-    if (sqlite3_step(stmt) == SQLITE_ROW) {
-        count = sqlite3_column_int(stmt, 0);
+    sqlite3_bind_int(stmt, 1, user_id);
+    sqlite3_bind_text(stmt, 2, winner, -1, SQLITE_STATIC);
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "Error executing statement: %s\n", sqlite3_errmsg(db));
     }
 
     sqlite3_finalize(stmt);
-
-    // Si el partido ya existe, devolver un error
-    if (count > 0) {
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Match already exists in the database.\n");
-        return 1;
-    }
-
-    // Insertar el partido en la base de datos
-    char insert_query[512];
-    sprintf(insert_query, "INSERT INTO MATCHES (date, user_id, winner) "
-                          "VALUES ('%s', %d, '%s');",
-                          date, user_id, winner);
-
-    rc = sqlite3_exec(db, insert_query, 0, 0, 0);
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed inserting data into MATCHES table: %s\n", sqlite3_errmsg(db));
-        return 1;
-    }
-
-    return 0;
 }
-
 
 // Save a new movement
 int save_movement(sqlite3* db, int match_id, int movement_n, const char* movement) {
@@ -404,22 +389,19 @@ int save_movement(sqlite3* db, int match_id, int movement_n, const char* movemen
     return 0;
 }
 
-
-int save_username(sqlite3* db, const char* username) {
-    int result = 0; // Variable para almacenar el resultado de la operación
-
-    // Check if the username already exists in the database
+void save_username(sqlite3* db, const char* username) {
+    // Verificar si el nombre de usuario ya existe en la base de datos
     sqlite3_stmt* stmt;
     const char* select_query = "SELECT COUNT(*) FROM USERS WHERE username=?";
     int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
-        return -1; // Devuelve -1 en caso de error
+        return; // Salir de la función en caso de error
     }
 
     sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
 
-    // Execute the selection query
+    // Ejecutar la consulta de selección
     int count = 0;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         count = sqlite3_column_int(stmt, 0);
@@ -427,76 +409,94 @@ int save_username(sqlite3* db, const char* username) {
 
     sqlite3_finalize(stmt);
 
-    // If the username already exists, return 0
+    // Si el nombre de usuario ya existe, imprimir un mensaje de advertencia y salir
     if (count > 0) {
         printf("\e[0;33m[WARNING]\e[0m User %s already exists in the database\n", username);
-        return 0;
+        return;
     }
 
-    // Insert the user in the database
+    // Insertar el usuario en la base de datos
     const char* insert_query = "INSERT INTO USERS (username) VALUES (?)";
     rc = sqlite3_prepare_v2(db, insert_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing insertion statement: %s\n", sqlite3_errmsg(db));
-        return -1; // Devuelve -1 en caso de error
+        return; // Salir de la función en caso de error
     }
 
     sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
 
-    // Execute the insertion query
+    // Ejecutar la consulta de inserción
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed inserting data into USERS table: %s\n", sqlite3_errmsg(db));
-        return -1; // Devuelve -1 en caso de error
+        return; // Salir de la función en caso de error
     }
 
     printf("Username %s saved successfully\n", username);
-    result = 1; // La operación se realizó correctamente, devuelve 1
-    return result;
 }
 
+void increment_matches(sqlite3* db, const char* username) {
+    char *sql = "UPDATE USERS SET matches_played = matches_played + 1 WHERE username = ?";
+    sqlite3_stmt *stmt;
+    int rc;
 
-// Show statistics of current user
-void show_user_statistics(sqlite3* db, const char* username) {
-    // Build the select query
-    char select_query[512];
-    sprintf(select_query, "SELECT * FROM USERS WHERE username='%s';", username);
-
-    sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "Error preparing statement: %s\n", sqlite3_errmsg(db));
         return;
     }
 
-    printf("\n\e[1;97mUser Statistics:\e[0m\n");
-    printf(
-        "+----+----------+------------+------+---------------+---------+-----------------+-----------------+\n"
-        "| ID | Username |  Password  | ELO  | Creation Date | Winrate | Winrate (white) | Winrate (black) |\n"
-        "+----+----------+------------+------+---------------+---------+-----------------+-----------------+\n"
-    );
-    if (sqlite3_step(stmt) == SQLITE_ROW) {
-        int user_id = sqlite3_column_int(stmt, 0);
-        const unsigned char* username = sqlite3_column_text(stmt, 1);
-        const unsigned char* password = sqlite3_column_text(stmt, 2);
-        int elo = sqlite3_column_int(stmt, 3);
-        const unsigned char* creation_date = sqlite3_column_text(stmt, 4);
-        double winrate = sqlite3_column_double(stmt, 5);
-        double winrate_white = sqlite3_column_double(stmt, 6);
-        double winrate_black = sqlite3_column_double(stmt, 7);
+    sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
 
-        printf(
-            "| %-2d | %-8s | %-10s | %d |  %s   |  %.2f   |      %.2f       |      %.2f       |\n",
-            user_id,
-            username,
-            password,
-            elo,
-            creation_date,
-            winrate,
-            winrate_white,
-            winrate_black
-        );
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "Error updating matches_played: %s\n", sqlite3_errmsg(db));
     }
-    printf("+----+----------+------------+------+---------------+---------+-----------------+-----------------+\n\n");
+
     sqlite3_finalize(stmt);
+}
+
+void increment_wins(sqlite3* db, const char* username) {
+    char *sql = "UPDATE USERS SET matches_won = matches_won + 1 WHERE username = ?";
+    sqlite3_stmt *stmt;
+    int rc;
+
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Error preparing statement: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "Error updating matches_won: %s\n", sqlite3_errmsg(db));
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+int get_user_id(sqlite3* db, const char* username) {
+    char* sql = "SELECT user_id FROM USERS WHERE username = ?";
+    sqlite3_stmt* stmt;
+    int user_id = -1; // Valor predeterminado si no se encuentra el usuario
+
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Error preparing statement: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+
+    sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_ROW) {
+        user_id = sqlite3_column_int(stmt, 0);
+    } else if (rc != SQLITE_DONE) {
+        fprintf(stderr, "Error executing statement: %s\n", sqlite3_errmsg(db));
+    }
+
+    sqlite3_finalize(stmt);
+    return user_id;
 }

@@ -43,10 +43,17 @@ int user_exists(sqlite3* db, int user_id);
 int delete_rows(sqlite3* db, const char* table, const char* condition);
 
 // Save a new match
-int save_match(sqlite3* db, const char* date, int user_id, const char* winner);
+void save_match(sqlite3* db, int user_id, const char* winner);
+
 // Save a new move
 int save_movement(sqlite3* db, int match_id, int movement_n, const char* movement);
 
-int save_username(sqlite3* db, const char* username);
+void save_username(sqlite3* db, const char* username);
+
+void increment_matches(sqlite3* db, const char* username);
+
+void increment_wins(sqlite3* db, const char* username);
+
+int get_user_id(sqlite3* db, const char* username);
 
 #endif // _SERVER_DATABASE_H

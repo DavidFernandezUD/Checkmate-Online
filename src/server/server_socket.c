@@ -73,11 +73,7 @@ void start_server(sqlite3* db) {
         printf("Received username from client: %s\n", username_buffer);
 
         // Almacenar el nombre de usuario en la base de datos
-        if (save_username(db, username_buffer) != 0) {
-            printf("Failed to save username in the database.\n");
-        } else {
-            printf("Username saved in the database.\n");
-        }
+        save_username(db, username_buffer);
     }
 
     // Initialize attack tables for chess engine
@@ -90,7 +86,7 @@ void start_server(sqlite3* db) {
         if (strcmp(recvBuff, "play") == 0) {
             // Start uci loop
             Position pos;
-            uci_loop2(comm_socket, &pos);
+            uci_loop2(comm_socket, db, username_buffer, &pos);
         } else {
             printf("Unexpected command received: %s\n", recvBuff);
         }
