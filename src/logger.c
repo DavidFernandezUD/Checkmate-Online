@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "logger.h"
 
-void log(char* path, char* message) {
+void log_msg(char* path, char* message) {
 
     FILE* file = fopen(path, "a");
     if (file == NULL) {

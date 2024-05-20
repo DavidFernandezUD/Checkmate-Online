@@ -12,7 +12,7 @@
 #define _LOGGER_H
 
 
-void log(char* path, char* message);
+void log_msg(char* path, char* message);
 
 
 #endif // _LOGGER_H

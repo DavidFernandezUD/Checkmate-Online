@@ -23,7 +23,7 @@ int checkCredentials(const char *username, const char *password) {
 
     // Check if the admin config file
     if (file == NULL) {
-        log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed opening config file at config/serverconfig.txt\n");
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed opening config file at config/serverconfig.txt\n");
         exit(1);
     }
 
@@ -57,7 +57,7 @@ void requestCredentials(int* credentialsValid) {
     if (fgets(username, MAX_A_USERNAME_LEN, stdin) != NULL) {
         username[strcspn(username, "\n")] = 0; // Remove the line break from the admin username
     } else {
-        log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
         exit(1);
     }
     
@@ -66,17 +66,17 @@ void requestCredentials(int* credentialsValid) {
     if (fgets(password, MAX_A_PASSWORD_LEN, stdin)) {
         password[strcspn(password, "\n")] = 0; // Remove the line break from the admin password
     } else {
-        log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
         exit(1);
     }
 
     // Accept access in case of correct admin username and password and vice versa
     if (checkCredentials(username, password)) {
-        log("logs/server.log", "[INFO] Valid credentials, access granted\n");
+        log_msg("logs/server.log", "[INFO] Valid credentials, access granted\n");
         printf("Valid credentials. Access granted.\n");
         *credentialsValid = 1;
     } else {
-        log("logs/server.log", "[INFO] Invalid credentials, access denied\n");
+        log_msg("logs/server.log", "[INFO] Invalid credentials, access denied\n");
         printf("Invalid credentials. Access denied.\n");
         *credentialsValid = 0;
     }
@@ -106,7 +106,7 @@ void update_user(sqlite3* db) {
     }
 
     if (update_user_parameter(db, user_id, parameter, new_value) != 0) {
-        log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
         return;
     }
 
@@ -128,7 +128,7 @@ void remove_user(sqlite3* db) {
     sprintf(condition, "user_id = %d", user_id);
 
     if (delete_rows(db, "USERS", condition) != 0) {
-        log("logs/server.log", "\e[0;31m[ERROR\e[0m deleting rows from the USERS table\n");
+        log_msg("logs/server.log", "\e[0;31m[ERROR\e[0m deleting rows from the USERS table\n");
     }
 }
 
@@ -153,7 +153,7 @@ void manage_users_menu(sqlite3* db) {
             case 'q':
                 break;
             default:
-                log("logs/server.log", "\e[0;31m[ERROR]\e[0m Not a valid option\n");
+                log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Not a valid option\n");
                 break;
         }
     } while (choice != 'q');
@@ -186,7 +186,7 @@ void handle_main_menu_option(sqlite3* db, char choice) {
         case 'q':
             break;
         default:
-            log("logs/server.log", "\e[0;31m[ERROR]\e[0m Not a valid option\n");
+            log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Not a valid option\n");
             break;
     }
 }
