@@ -1,4 +1,0 @@
-JUGADORES (id-jugador, nombre, contraseña, ELO, fecha de creación, winrate, winrate-blancas, winrate-negras)
-PARTIDAS (id-partida, fecha, id-jugador-negras, id-jugador-blancas, tipo-partida)
-MOVIMIENTOS (id-movimiento, n-movimiento, movimiento, id-partida, tiempo-movimiento)
-CHATS (id-chat, n-chat, chat, id-partida, tiempo-chat, id-jugador-sender, id-jugador-receiver)

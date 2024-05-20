@@ -1,4 +1,5 @@
 #include "server_database.h"
+#include "../logger.h"
 
 // Just to test the "load_users" function
 User users[] = {
@@ -17,6 +18,7 @@ int load_users(sqlite3* db, User* users, int n_users) {
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
         if (rc != SQLITE_OK) {
+            log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed preparing statement\n");
             fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
             return 1;
         }
@@ -31,6 +33,7 @@ int load_users(sqlite3* db, User* users, int n_users) {
 
         // If the user already exists, go to the next one
         if (count > 0) {
+            log_msg("logs/server.log", "\e[0;33m[WARNING]\e[0m User %s already exists in the database\n");
             printf("\e[0;33m[WARNING]\e[0m User %s already exists in the database\n", users[i].username);
             continue;
         }
@@ -43,6 +46,7 @@ int load_users(sqlite3* db, User* users, int n_users) {
         // Execute the insertion query
         rc = sqlite3_exec(db, insert_query, 0, 0, 0);
         if (rc != SQLITE_OK) {
+            log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed inserting data into USERS table\n");
             fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed inserting data into USERS table: %s\n", sqlite3_errmsg(db));
             return 1;
         }
@@ -68,6 +72,7 @@ int load_matches(sqlite3* db, Match* matches, int n_matches) {
         sqlite3_stmt* stmt;
         int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
         if (rc != SQLITE_OK) {
+            log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed preparing statement\n");
             fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
             return 1;
         }
@@ -82,6 +87,7 @@ int load_matches(sqlite3* db, Match* matches, int n_matches) {
 
         // If the match already exists, go to the next one
         if (count > 0) {
+            log_msg("logs/server.log", "\e[0;33m[WARNING]\e[0m Match already exists in the database\n");
             fprintf(stderr, "\e[0;33m[WARNING]\e[0m Match already exists in the database\n");
             continue;
         }
@@ -95,6 +101,7 @@ int load_matches(sqlite3* db, Match* matches, int n_matches) {
         // Execute the insertion query
         rc = sqlite3_exec(db, insert_query, 0, 0, 0);
         if (rc != SQLITE_OK) {
+            log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed inserting data into MATCHES table\n");
             fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed inserting data into MATCHES table: %s\n", sqlite3_errmsg(db));
             return 1;
         }
@@ -107,6 +114,7 @@ int load_matches(sqlite3* db, Match* matches, int n_matches) {
 int initialize_db(sqlite3** db) {
     int rc = sqlite3_open("database.db", db);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m failed opening the database\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m failed opening the database: %s\n", sqlite3_errmsg(*db));
         sqlite3_close(*db);
         return 1;
@@ -163,6 +171,7 @@ int initialize_db(sqlite3** db) {
     // USERS TABLE
     rc = sqlite3_exec(*db, create_users_table, 0, 0, 0);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed creating table USERS\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed creating table USERS: %s\n", sqlite3_errmsg(*db));
         return 1;
     }
@@ -174,6 +183,7 @@ int initialize_db(sqlite3** db) {
     // MATCHES TABLE
     rc = sqlite3_exec(*db, create_matches_table, 0, 0, 0);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed creating table MATCHES\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed creating table MATCHES: %s\n", sqlite3_errmsg(*db));
         return 1;
     }
@@ -185,6 +195,7 @@ int initialize_db(sqlite3** db) {
     // MOVEMENTS TABLE
     rc = sqlite3_exec(*db, create_movements_table, 0, 0, 0);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed creating table MOVEMENTS\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed creating table MOVEMENTS: %s\n", sqlite3_errmsg(*db));
         return 1;
     }
@@ -213,6 +224,7 @@ void show_users(sqlite3* db) {
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed preparing statement\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
         return;
     }
@@ -250,6 +262,7 @@ void show_matches(sqlite3* db) {
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed preparing statement\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
         return;
     }
@@ -291,6 +304,7 @@ int update_user_parameter(sqlite3* db, int user_id, const char* parameter, const
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, update_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed preparing update query\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing update query: %s\n", sqlite3_errmsg(db));
         return 1;
     }
@@ -305,6 +319,7 @@ int update_user_parameter(sqlite3* db, int user_id, const char* parameter, const
 
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed updating user parameter in USERS table\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed updating user parameter in USERS table: %s\n", sqlite3_errmsg(db));
         sqlite3_finalize(stmt);
         return 1;
@@ -321,6 +336,7 @@ int user_exists(sqlite3* db, int user_id) {
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed preparing statement\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
         return 0; // Indica un error, el usuario no existe
     }
@@ -344,6 +360,7 @@ int delete_rows(sqlite3* db, const char* table, const char* condition) {
     // Ejecutar la consulta de eliminación
     int rc = sqlite3_exec(db, delete_query, 0, 0, 0);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed deleting rows from table\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed deleting rows from table %s: %s\n", table, sqlite3_errmsg(db));
         return 1;
     }
@@ -357,6 +374,7 @@ void save_match(sqlite3* db, int user_id, const char* winner) {
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Error preparing statement\n");
         fprintf(stderr, "Error preparing statement: %s\n", sqlite3_errmsg(db));
         return;
     }
@@ -366,6 +384,7 @@ void save_match(sqlite3* db, int user_id, const char* winner) {
 
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Error executing statement\n");
         fprintf(stderr, "Error executing statement: %s\n", sqlite3_errmsg(db));
     }
 
@@ -382,6 +401,7 @@ int save_movement(sqlite3* db, int match_id, int movement_n, const char* movemen
 
     int rc = sqlite3_exec(db, insert_query, 0, 0, 0);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed inserting data into MOVEMENTS table\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed inserting data into MOVEMENTS table: %s\n", sqlite3_errmsg(db));
         return 1;
     }
@@ -395,6 +415,7 @@ void save_username(sqlite3* db, const char* username) {
     const char* select_query = "SELECT COUNT(*) FROM USERS WHERE username=?";
     int rc = sqlite3_prepare_v2(db, select_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed preparing statement\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing statement: %s\n", sqlite3_errmsg(db));
         return; // Salir de la función en caso de error
     }
@@ -411,7 +432,8 @@ void save_username(sqlite3* db, const char* username) {
 
     // Si el nombre de usuario ya existe, imprimir un mensaje de advertencia y salir
     if (count > 0) {
-        printf("\e[0;33m[WARNING]\e[0m User %s already exists in the database\n", username);
+        log_msg("logs/server.log", "\e[0;33m[WARNING]\e[0m User already exists in the database\n");
+        fprintf(stderr, "\e[0;33m[WARNING]\e[0m User %s already exists in the database\n", username);
         return;
     }
 
@@ -419,6 +441,7 @@ void save_username(sqlite3* db, const char* username) {
     const char* insert_query = "INSERT INTO USERS (username) VALUES (?)";
     rc = sqlite3_prepare_v2(db, insert_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed preparing insertion statement\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed preparing insertion statement: %s\n", sqlite3_errmsg(db));
         return; // Salir de la función en caso de error
     }
@@ -428,10 +451,12 @@ void save_username(sqlite3* db, const char* username) {
     // Ejecutar la consulta de inserción
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed inserting data into USERS table\n");
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed inserting data into USERS table: %s\n", sqlite3_errmsg(db));
         return; // Salir de la función en caso de error
     }
 
+    log_msg("logs/server.log", "[INFO] Username saved successfully\n");
     printf("Username %s saved successfully\n", username);
 }
 
@@ -442,6 +467,7 @@ void increment_matches(sqlite3* db, const char* username) {
 
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Error preparing statement\n");
         fprintf(stderr, "Error preparing statement: %s\n", sqlite3_errmsg(db));
         return;
     }
@@ -450,6 +476,7 @@ void increment_matches(sqlite3* db, const char* username) {
 
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Error updating matches_played\n");
         fprintf(stderr, "Error updating matches_played: %s\n", sqlite3_errmsg(db));
     }
 
@@ -463,6 +490,7 @@ void increment_wins(sqlite3* db, const char* username) {
 
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Error preparing statement\n");
         fprintf(stderr, "Error preparing statement: %s\n", sqlite3_errmsg(db));
         return;
     }
@@ -484,6 +512,7 @@ int get_user_id(sqlite3* db, const char* username) {
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Error preparing statement\n");
         fprintf(stderr, "Error preparing statement: %s\n", sqlite3_errmsg(db));
         return -1;
     }
@@ -494,6 +523,7 @@ int get_user_id(sqlite3* db, const char* username) {
     if (rc == SQLITE_ROW) {
         user_id = sqlite3_column_int(stmt, 0);
     } else if (rc != SQLITE_DONE) {
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Error executing statement\n");
         fprintf(stderr, "Error executing statement: %s\n", sqlite3_errmsg(db));
     }
 

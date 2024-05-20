@@ -1,4 +1,5 @@
 #include "server.h"
+#include "../logger.h"
 
 int main() {
 
@@ -12,7 +13,7 @@ int main() {
     // Initialize database
     sqlite3 *db;
     if (initialize_db(&db) != 0) {
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed to initialize the database\n");
+        log_msg("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed to initialize the database\n");
         return 1;
     }
 

@@ -21,7 +21,6 @@ void log_msg(char* path, char* message) {
     }
 
     fputs(message, file);
-    fprintf(stderr, message);
 
     fclose(file);
 }
