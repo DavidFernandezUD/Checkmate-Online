@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include "../../lib/sqlite/sqlite3.h"
 
-#include "database.h"
+#include "server_database.h"
 #include "server_socket.h"
 
 #define MAX_A_USERNAME_LEN 50

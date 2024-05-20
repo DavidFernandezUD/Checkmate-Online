@@ -2,7 +2,9 @@
 #include <time.h>
 #include "server.h"
 #include "../chess/uci.h"
-// gcc src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
+/* 
+gcc src/server/server_database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
+*/
 
 // TODO: Improve config file
 
@@ -43,7 +45,6 @@ int checkCredentials(const char *username, const char *password) {
     return 0;
 }
 
-
 // Request admin credentials in the console
 void requestCredentials(int* credentialsValid) {
 
@@ -78,25 +79,35 @@ void requestCredentials(int* credentialsValid) {
     }
 }
 
-
 // Ask and update parameters of the USERS table
 void update_user(sqlite3* db) {
-    
     printf("Enter the ID of the user you want to edit: ");
     int user_id;
-    scanf("%d", &user_id);
+    if (scanf("%d", &user_id) != 1) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Invalid user ID.\n");
+        return;
+    }
 
-    printf("Which parameter do you want to edit? (name, password, elo): ");
+    printf("Which parameter do you want to edit? (username, matches_played, matches_won): ");
     char parameter[MAX_PARAMETER_LENGTH];
-    scanf("%s", parameter);
+    if (scanf("%s", parameter) != 1) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed to read parameter.\n");
+        return;
+    }
 
     printf("Enter the new value: ");
     char new_value[MAX_VALUE_LENGTH];
-    scanf("%s", new_value);
+    if (scanf("%s", new_value) != 1) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed to read new value.\n");
+        return;
+    }
 
     if (update_user_parameter(db, user_id, parameter, new_value) != 0) {
         fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
+        return;
     }
+
+    printf("User parameter updated successfully.\n");
 }
 
 // Delete selected user from the database
@@ -104,13 +115,19 @@ void remove_user(sqlite3* db) {
     printf("Enter the ID of the user you want to delete: ");
     int user_id;
     scanf("%d", &user_id);
+
+    if (!user_exists(db, user_id)) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m User with ID %d does not exist.\n", user_id);
+        return;
+    }
+
     char condition[50];
     sprintf(condition, "user_id = %d", user_id);
+
     if (delete_rows(db, "USERS", condition) != 0) {
-        fprintf(stderr, "\e[0;31m[ERROR\e[0m deleting rows from the USERS table\n");
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed deleting user from the USERS table\n");
     }
 }
-
 
 // Handle user managing menu options
 void manage_users_menu(sqlite3* db) {
@@ -155,7 +172,7 @@ void show_main_menu() {
 void handle_main_menu_option(sqlite3* db, char choice) {
     switch (choice) {
         case 's':
-            start_server();
+            start_server(db);
             break;
         case 'u':
             manage_users_menu(db);

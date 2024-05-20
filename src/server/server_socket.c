@@ -2,7 +2,7 @@
 #include "server.h"
 
 // Start the server (wait for connecting client)
-void start_server() {
+void start_server(sqlite3* db) {
 	WSADATA wsaData;
     SOCKET conn_socket;
     struct sockaddr_in server;
@@ -15,7 +15,7 @@ void start_server() {
         return;
     }
 
-	//cSOCKET creation
+	//SOCKET creation
 	if ((conn_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
         printf("Could not create socket : %d", WSAGetLastError());
         WSACleanup();
@@ -47,6 +47,7 @@ void start_server() {
     printf("Waiting for incoming connections...\n");
     int stsize = sizeof(struct sockaddr);
     SOCKET comm_socket = accept(conn_socket, (struct sockaddr*)&client, &stsize);
+
 	// Using comm_socket is able to send/receive data to/from connected client
     if (comm_socket == INVALID_SOCKET) {
         printf("accept failed with error code : %d", WSAGetLastError());
@@ -59,6 +60,25 @@ void start_server() {
 
 	// Close the listening socket (is not going to be used anymore)
     closesocket(conn_socket);
+
+    char username_buffer[50];
+
+    // Receive username from client
+    int bytes_received_username = recv(comm_socket, username_buffer, sizeof(username_buffer), 0);
+    if (bytes_received_username == SOCKET_ERROR) {
+        printf("Failed to receive username from client.\n");
+    } else {
+        // Null-terminate el nombre de usuario recibido
+        username_buffer[bytes_received_username] = '\0';
+        printf("Received username from client: %s\n", username_buffer);
+
+        // Almacenar el nombre de usuario en la base de datos
+        if (save_username(db, username_buffer) != 0) {
+            printf("Failed to save username in the database.\n");
+        } else {
+            printf("Username saved in the database.\n");
+        }
+    }
 
     // Initialize attack tables for chess engine
     init_piece_attacks();

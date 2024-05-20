@@ -1,6 +1,6 @@
 #include "client.h"
 
-// g++ src/client/client_main.cpp src/client/client_socket.cpp src/client/client.cpp src/client/user.cpp -lm -lws2_32 -o bin/client
+// g++ src/client/client_database.cpp src/client/client_main.cpp src/client/client_socket.cpp src/client/client.cpp src/client/user.cpp -lm -lws2_32 -o bin/client
 
 // Print main menu options
 void show_main_menu() {

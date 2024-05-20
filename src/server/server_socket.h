@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <winsock2.h>
+#include "../../lib/sqlite/sqlite3.h"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
@@ -21,6 +22,6 @@
 #define _SERVER_SOCKET_H
 
 // Start the server (wait for connecting client)
-void start_server();
+void start_server(sqlite3* db);
 
 #endif // _SERVER_SOCKET_H

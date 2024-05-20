@@ -2,6 +2,7 @@
 
 #include "client_socket.h"
 #include "user.h"
+#include "client_database.h"
 
 #ifndef _CLIENT_H
 #define _CLIENT_H

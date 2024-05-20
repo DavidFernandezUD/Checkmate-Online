@@ -14,7 +14,10 @@ int main() {
 
     user.setUsername(username);
 
+    // send username to the server
     std::cout << std::endl << "Welcome to Checkmate Online, " << user.getUsername() << "!" << std::endl << std::endl;
+
+    send_username_to_server(s, user.getUsername());
 
 
     char choice;
