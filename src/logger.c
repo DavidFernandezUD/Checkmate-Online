@@ -9,6 +9,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "logger.h"
 
 void log_msg(char* path, char* message) {
@@ -19,7 +20,7 @@ void log_msg(char* path, char* message) {
         exit(1);
     }
 
-    fprintf(file, message);
+    fputs(message, file);
     fprintf(stderr, message);
 
     fclose(file);
