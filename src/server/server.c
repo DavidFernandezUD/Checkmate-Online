@@ -2,7 +2,7 @@
 #include <time.h>
 #include "server.h"
 #include "../chess/uci.h"
-#include "logger.h"
+#include "../logger.h"
 // gcc src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
 // TODO: Improve config file
 
@@ -103,12 +103,8 @@ void update_user(sqlite3* db) {
     }
 
     if (update_user_parameter(db, user_id, parameter, new_value) != 0) {
-<<<<<<< HEAD:src/server/server.cpp
         log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
-=======
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
         return;
->>>>>>> 6f60c5c0d4f8827bcf71a7132338335d22066e50:src/server/server.c
     }
 
     printf("User parameter updated successfully.\n");
