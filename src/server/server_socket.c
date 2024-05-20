@@ -2,20 +2,18 @@
 #include "server.h"
 
 // Start the server (wait for connecting client)
-void start_server() {
+void start_server(sqlite3* db) {
 	WSADATA wsaData;
     SOCKET conn_socket;
     struct sockaddr_in server;
     struct sockaddr_in client;
     char recvBuff[512];
 
-	//printf("\nInitialising Winsock...\n");
+	//cprintf("\nInitialising Winsock...\n");
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         printf("Failed. Error Code : %d", WSAGetLastError());
         return;
     }
-
-	//printf("Initialised.\n");
 
 	//SOCKET creation
 	if ((conn_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
@@ -23,8 +21,6 @@ void start_server() {
         WSACleanup();
         return;
     }
-
-	//printf("Socket created.\n");
 
 	server.sin_addr.s_addr = INADDR_ANY;
     server.sin_family = AF_INET;
@@ -39,8 +35,6 @@ void start_server() {
         return;
     }
 
-	//printf("Bind done.\n");
-
 	// LISTEN to incoming connections (socket server moves to listening mode)
     if (listen(conn_socket, 1) == SOCKET_ERROR) {
         printf("Listen failed with error code: %d", WSAGetLastError());
@@ -53,6 +47,7 @@ void start_server() {
     printf("Waiting for incoming connections...\n");
     int stsize = sizeof(struct sockaddr);
     SOCKET comm_socket = accept(conn_socket, (struct sockaddr*)&client, &stsize);
+
 	// Using comm_socket is able to send/receive data to/from connected client
     if (comm_socket == INVALID_SOCKET) {
         printf("accept failed with error code : %d", WSAGetLastError());
@@ -66,13 +61,38 @@ void start_server() {
 	// Close the listening socket (is not going to be used anymore)
     closesocket(conn_socket);
 
-	// Start uci loop for communication with the client
+    char username_buffer[50];
+
+    // Receive username from client
+    int bytes_received_username = recv(comm_socket, username_buffer, sizeof(username_buffer), 0);
+    if (bytes_received_username == SOCKET_ERROR) {
+        printf("Failed to receive username from client.\n");
+    } else {
+        // Null-terminate el nombre de usuario recibido
+        username_buffer[bytes_received_username] = '\0';
+        printf("Received username from client: %s\n", username_buffer);
+
+        // Almacenar el nombre de usuario en la base de datos
+        save_username(db, username_buffer);
+    }
+
+    // Initialize attack tables for chess engine
     init_piece_attacks();
 
-    Position pos;
-    Game game(pos);
-
-    uci_loop2(comm_socket, &game);
+    // Wait for "play" command from client
+    int bytes_received = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
+    if (bytes_received > 0) {
+        recvBuff[bytes_received] = '\0'; // Null-terminate the buffer
+        if (strcmp(recvBuff, "play") == 0) {
+            // Start uci loop
+            Position pos;
+            uci_loop2(comm_socket, db, username_buffer, &pos);
+        } else {
+            printf("Unexpected command received: %s\n", recvBuff);
+        }
+    } else {
+        printf("Failed to receive data from client.\n");
+    }
 
 	// CLOSE the socket and clean Winsock...
     closesocket(comm_socket);

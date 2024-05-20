@@ -1,0 +1,5 @@
+1. Printear mejor el tablero en el cliente (Intenta que se vea igual quie en el print_position del server)
+2. Acabar partida
+3. Guardar estadisticas al acabar parida
+4. Quitar mierda que sale al empezar partida
+5. Hacer que e uci loop solo funcione cuando el jugador le da a play

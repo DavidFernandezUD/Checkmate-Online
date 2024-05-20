@@ -1,9 +1,9 @@
 #include <string.h>
+#include <time.h>
 #include "server.h"
 #include "../chess/uci.h"
 #include "logger.h"
-// g++ src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
-
+// gcc src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
 // TODO: Improve config file
 
 // Check if itroduced admin credentials are correct
@@ -43,7 +43,6 @@ int checkCredentials(const char *username, const char *password) {
     return 0;
 }
 
-
 // Request admin credentials in the console
 void requestCredentials(int* credentialsValid) {
 
@@ -80,40 +79,59 @@ void requestCredentials(int* credentialsValid) {
     }
 }
 
-
 // Ask and update parameters of the USERS table
 void update_user(sqlite3* db) {
-    
     printf("Enter the ID of the user you want to edit: ");
     int user_id;
-    scanf("%d", &user_id);
+    if (scanf("%d", &user_id) != 1) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Invalid user ID.\n");
+        return;
+    }
 
-    printf("Which parameter do you want to edit? (name, password, elo): ");
+    printf("Which parameter do you want to edit? (username, matches_played, matches_won): ");
     char parameter[MAX_PARAMETER_LENGTH];
-    scanf("%s", parameter);
+    if (scanf("%s", parameter) != 1) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed to read parameter.\n");
+        return;
+    }
 
     printf("Enter the new value: ");
     char new_value[MAX_VALUE_LENGTH];
-    scanf("%s", new_value);
+    if (scanf("%s", new_value) != 1) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed to read new value.\n");
+        return;
+    }
 
     if (update_user_parameter(db, user_id, parameter, new_value) != 0) {
+<<<<<<< HEAD:src/server/server.cpp
         log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
+=======
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
+        return;
+>>>>>>> 6f60c5c0d4f8827bcf71a7132338335d22066e50:src/server/server.c
     }
+
+    printf("User parameter updated successfully.\n");
 }
 
-int
 // Delete selected user from the database
 void remove_user(sqlite3* db) {
     printf("Enter the ID of the user you want to delete: ");
     int user_id;
     scanf("%d", &user_id);
+
+    if (!user_exists(db, user_id)) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m User with ID %d does not exist.\n", user_id);
+        return;
+    }
+
     char condition[50];
     sprintf(condition, "user_id = %d", user_id);
+
     if (delete_rows(db, "USERS", condition) != 0) {
         log("logs/server.log", "\e[0;31m[ERROR\e[0m deleting rows from the USERS table\n");
     }
 }
-
 
 // Handle user managing menu options
 void manage_users_menu(sqlite3* db) {
@@ -158,7 +176,7 @@ void show_main_menu() {
 void handle_main_menu_option(sqlite3* db, char choice) {
     switch (choice) {
         case 's':
-            start_server();
+            start_server(db);
             break;
         case 'u':
             manage_users_menu(db);
@@ -174,47 +192,27 @@ void handle_main_menu_option(sqlite3* db, char choice) {
     }
 }
 
+int makePlayerMove(Position* pos, char* moves, char* move, unsigned int* n_move) {
 
-Game::Game(Position& pos) {
-
-    this->pos = pos;
-    
-    n_move = 0;
-    strcpy(moves, "position startpos moves ");
-
-    parse_fen(&pos, moves);
-    
-    playerColor = (((float) rand() / RAND_MAX) > 0.5) WHITE : BLACK;
-}
-
-Color Game::getPlayerColor() {
-    return playerColor;
-}
-
-unsigned int Game::getMove() {
-    return n_move;
-}
-
-int Game::makeMove(char* move) {
-
-    char* temp_moves = new char[2048];
+    char* temp_moves = (char*) malloc(2048 * sizeof(char));
 
     strcpy(temp_moves, moves);
 
     strcat(temp_moves, move);
     strcat(temp_moves, " ");
 
-    if (parse_position(this->pos, temp_moves) == 0) {
+    if (parse_position(pos, temp_moves) == 0) {
         strcpy(moves, temp_moves);
-        n_move++;
+        free(temp_moves);
+        (*n_move)++;
         return 0;
     }
 
-    delete[] temp_moves;
+    free(temp_moves);
     return ERR_ILEGAL_MOVE;
 }
 
-void Game::makeEngineMove(Position* pos, int depth) {
+void makeEngineMove(Position* pos, char* moves, int depth, unsigned int* n_move) {
 
     int best_move;
     int half_moves = 0;
@@ -224,7 +222,7 @@ void Game::makeEngineMove(Position* pos, int depth) {
 
     char engine_move[16];
     if (GET_MOVE_PROMOTION(best_move)) {
-        sprintf(engine_move, "%s%s%c", square_to_coordinates[GET_MOVE_SRC(best_move)], square_to_coordinates[GET_MOVE_DST(best_move)], ASCII_PIECES[GET_MOVE_PROMOTION(move)]);
+        sprintf(engine_move, "%s%s%c", square_to_coordinates[GET_MOVE_SRC(best_move)], square_to_coordinates[GET_MOVE_DST(best_move)], ASCII_PIECES[GET_MOVE_PROMOTION(best_move)]);
     } else {
         sprintf(engine_move, "%s%s", square_to_coordinates[GET_MOVE_SRC(best_move)], square_to_coordinates[GET_MOVE_DST(best_move)]);
     }
@@ -232,20 +230,46 @@ void Game::makeEngineMove(Position* pos, int depth) {
     strcat(moves, engine_move);
     strcat(moves, " ");
 
-    parse_position(this->pos, moves);
-    n_move++;
+    parse_position(pos, moves);
+    (*n_move)++;
 }
 
 // Start uciloop (wait for an incoming move command)
-void uci_loop2(SOCKET client_socket, Game* game) {
+void uci_loop2(SOCKET client_socket, sqlite3* db, const char* username, Position* pos)  {
+
     const int BUFFER_LEN = 2048;
     char input_buffer[BUFFER_LEN];
 
-    // Send the welcome message to the client
-    send(client_socket, "uciok\n", strlen("uciok\n"), 0);
+    // Initialize game
+    unsigned int n_move;
+    char moves[2048];
+    Color playerColor;
+
+    n_move = 0;
+    strcpy(moves, "position startpos");
+    parse_position(pos, moves);
+    
+    // Randomize player color
+    srand(time(NULL));
+    playerColor = (rand() % 2 == 0) ? WHITE : BLACK;
+
+    strcat(moves, " moves ");
+
+    if (playerColor == BLACK) {
+        
+        // Engine does first move
+        makeEngineMove(pos, moves, 6, &n_move);
+
+        // Send color to player
+        send(client_socket, "You play as BLACK\n", 19, 0);
+    } else {
+        // Send color to player
+        send(client_socket, "You play as WHITE\n", 19, 0);
+    }
+
+    send_position_to_client(client_socket, *pos);
 
     while (1) {
-        
 
         // Reset user input buffer
         memset(input_buffer, 0, sizeof(input_buffer));
@@ -257,26 +281,38 @@ void uci_loop2(SOCKET client_socket, Game* game) {
             break;
         }
 
-        if (game->getMove() == 0 && game->getPlayerColor() == BLACK) {
-            game->makeEngineMove(pos, 6);
-            print_position(*pos);
-        }
-
         // Parse UCI commands received from the client
-        if (game->makeMove(input_buffer) == ERR_ILEGAL_MOVE) {
-            // TODO: Send player message to retry
+        if (makePlayerMove(pos, moves, input_buffer, &n_move) == ERR_ILEGAL_MOVE) {
+            send(client_socket, "Ilegal move, try again!\n", 25, 0);
             continue;
         }
-        print_position(*pos);
+        print_position(*(pos));
 
-        // TODO: Check that player hasn't won
-        if (1) {
+        MoveList list;
+
+        // Check that the player hasn't won
+        generate_moves(pos, &list);
+        if (list.top != 0) {
+
             // Engine makes move after player
-            game->makeEngineMove(pos, 6);
-        }
+            makeEngineMove(pos, moves, 6, &n_move);
+        
+            // Check that engine hasn't won the game
+            generate_moves(pos, &list);
+            if (list.top == 0) {
+                int user_id = get_user_id(db, username);
+                increment_matches(db, username);
+                send(client_socket, "Engine won!\n", 13, 0);
+                save_match(db, user_id, "BOT");
+                break;
+            }
 
-        // TODO: Check that engine hasn't won the game
-        if (0) {
+        } else {
+            int user_id = get_user_id(db, username);
+            increment_matches(db, username); // Incrementa partidas jugadas
+            increment_wins(db, username); 
+            send(client_socket, "Player won!\n", 13, 0);
+            save_match(db, user_id, "PLAYER");
             break;
         }
 
@@ -287,7 +323,6 @@ void uci_loop2(SOCKET client_socket, Game* game) {
     closesocket(client_socket);
 }
 
-
 // Send chessboard status to client
 void send_position_to_client(SOCKET client_socket, Position position) {
     char position_buffer[2048]; // Buffer size for storing the position
@@ -295,25 +330,32 @@ void send_position_to_client(SOCKET client_socket, Position position) {
     // Construct the position string in the buffer
     int offset = 0;
     for (int i = 0; i < 8; i++) {
+        // Add row number at the beginning of each line
+        offset += snprintf(position_buffer + offset, sizeof(position_buffer) - offset, " %d ", 8 - i);
+        
         for (int j = 0; j < 8; j++) {
             int square = i * 8 + j;
 
             int piece = -1;
-            for (int i = 0; i < 12; i++) {
-                if (GET_BIT(position.bitboards[i], square)) {
-                    piece = i;
+            for (int k = 0; k < 12; k++) {
+                if (GET_BIT(position.bitboards[k], square)) {
+                    piece = k;
+                    break;  // Stop once the piece is found
                 }
             }
 
             char piece_char = (piece == -1) ? '.' : ASCII_PIECES[piece];
-            position_buffer[offset++] = piece_char;
+            offset += snprintf(position_buffer + offset, sizeof(position_buffer) - offset, " %c", piece_char);
         }
         position_buffer[offset++] = '\n';
     }
 
+    // Add column labels
+    offset += snprintf(position_buffer + offset, sizeof(position_buffer) - offset, "\n    a b c d e f g h\n\n");
+
     // Add additional information to the buffer (turn, castling, enpassant)
     snprintf(position_buffer + offset, sizeof(position_buffer) - offset,
-             "\nTurn:      %s\n"
+             "Turn:      %s\n"
              "Castling:  %c%c%c%c\n"
              "Enpassant: %s\n\n",
              (position.turn == WHITE) ? "white" : "black",
@@ -323,6 +365,6 @@ void send_position_to_client(SOCKET client_socket, Position position) {
              (position.castling & BQ) ? 'q' : '-',
              (position.enpassant != NULL_SQUARE) ? square_to_coordinates[position.enpassant] : "no");
 
-    // Send the position to the customer via the socket
+    // Send the position to the client via the socket
     send(client_socket, position_buffer, strlen(position_buffer), 0);
 }

@@ -37,23 +37,26 @@ SOCKET connect_to_server() {
 
 // Send continuous moves to the server
 void make_moves(SOCKET s) {
+
     char message[512];
-    std::cout << "Enter a move to send to the server ('q' to quit):" << std::endl;
+
+    receive_and_print_information(s);
+
+    std::cout << "Enter a move to send to the server ('quit game' to quit):" << std::endl;
     while (true) {
         std::cin.getline(message, sizeof(message));
-        if (strcmp(message, "q") == 0) {
+        if (strcmp(message, "quit game") == 0) {
             if (send(s, message, strlen(message), 0) == SOCKET_ERROR) {
                 std::cerr << "Send failed with error code : " << WSAGetLastError() << std::endl;
                 return;
             }
-            std::cout << "Message sent: " << message << std::endl;
-            break; // Salir del bucle después de enviar 'q'
+            std::cout << std::endl;
+            break;
         }
         if (send(s, message, strlen(message), 0) == SOCKET_ERROR) {
             std::cerr << "Send failed with error code : " << WSAGetLastError() << std::endl;
             return;
         }
-        std::cout << "Message sent: " << message << std::endl;
 
         // After sending a move, receive and display server's information
         receive_and_print_information(s);
@@ -79,7 +82,7 @@ void receive_and_print_information(SOCKET s) {
 
     // Display received information
     buffer[bytes_received] = '\0';
-    std::cout << "Received data from server: " << std::endl << buffer << std::endl;
+    std::cout << std::endl << std::endl << buffer << std::endl;
 }
 
 // Request user statistics from server
