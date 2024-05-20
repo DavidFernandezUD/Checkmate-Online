@@ -9,7 +9,6 @@
 bin/
 
 # Ignore logs
-logs/
 *.log
 
 # Ignore any compiled object files

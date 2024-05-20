@@ -11,4 +11,16 @@
 #include <stdio.h>
 #include "logger.h"
 
-// TODO: Implement logger
+void log(char* path, char* message) {
+
+    FILE* file = fopen(path, "a");
+    if (file == NULL) {
+        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed opening log file\n");
+        exit(1);
+    }
+
+    fprintf(file, message);
+    fprintf(stderr, message);
+
+    fclose(file);
+}

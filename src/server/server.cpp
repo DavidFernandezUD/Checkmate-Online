@@ -1,6 +1,7 @@
 #include <string.h>
 #include "server.h"
 #include "../chess/uci.h"
+#include "logger.h"
 // g++ src/server/database.c src/server/server_main.c src/server/server_socket.c src/server/server.c lib/sqlite/sqlite3.c src/chess/attack.c src/chess/bitboard.c src/chess/eval.c src/chess/makemove.c src/chess/move.c src/chess/movegen.c src/chess/perftest.c src/chess/random.c src/chess/search.c src/chess/uci.c -lm -lws2_32 -o bin/server
 
 // TODO: Improve config file
@@ -19,7 +20,7 @@ int checkCredentials(const char *username, const char *password) {
 
     // Check if the admin config file
     if (file == NULL) {
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed opening config file at config/serverconfig.txt\n");
+        log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed opening config file at config/serverconfig.txt\n");
         exit(1);
     }
 
@@ -54,7 +55,7 @@ void requestCredentials(int* credentialsValid) {
     if (fgets(username, MAX_A_USERNAME_LEN, stdin) != NULL) {
         username[strcspn(username, "\n")] = 0; // Remove the line break from the admin username
     } else {
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
+        log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
         exit(1);
     }
     
@@ -63,15 +64,17 @@ void requestCredentials(int* credentialsValid) {
     if (fgets(password, MAX_A_PASSWORD_LEN, stdin)) {
         password[strcspn(password, "\n")] = 0; // Remove the line break from the admin password
     } else {
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
+        log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed reading user input\n");
         exit(1);
     }
 
     // Accept access in case of correct admin username and password and vice versa
     if (checkCredentials(username, password)) {
+        log("logs/server.log", "[INFO] Valid credentials, access granted\n");
         printf("Valid credentials. Access granted.\n");
         *credentialsValid = 1;
     } else {
+        log("logs/server.log", "[INFO] Invalid credentials, access denied\n");
         printf("Invalid credentials. Access denied.\n");
         *credentialsValid = 0;
     }
@@ -94,7 +97,7 @@ void update_user(sqlite3* db) {
     scanf("%s", new_value);
 
     if (update_user_parameter(db, user_id, parameter, new_value) != 0) {
-        fprintf(stderr, "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
+        log("logs/server.log", "\e[0;31m[ERROR]\e[0m Failed updating user parameter\n");
     }
 }
 
@@ -107,7 +110,7 @@ void remove_user(sqlite3* db) {
     char condition[50];
     sprintf(condition, "user_id = %d", user_id);
     if (delete_rows(db, "USERS", condition) != 0) {
-        fprintf(stderr, "\e[0;31m[ERROR\e[0m deleting rows from the USERS table\n");
+        log("logs/server.log", "\e[0;31m[ERROR\e[0m deleting rows from the USERS table\n");
     }
 }
 
@@ -133,7 +136,7 @@ void manage_users_menu(sqlite3* db) {
             case 'q':
                 break;
             default:
-                fprintf(stderr, "\e[0;31m[ERROR]\e[0m Not a valid option\n");
+                log("logs/server.log", "\e[0;31m[ERROR]\e[0m Not a valid option\n");
                 break;
         }
     } while (choice != 'q');
@@ -166,7 +169,7 @@ void handle_main_menu_option(sqlite3* db, char choice) {
         case 'q':
             break;
         default:
-            fprintf(stderr, "\e[0;31m[ERROR]\e[0m Not a valid option\n");
+            log("logs/server.log", "\e[0;31m[ERROR]\e[0m Not a valid option\n");
             break;
     }
 }

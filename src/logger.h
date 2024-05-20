@@ -12,7 +12,7 @@
 #define _LOGGER_H
 
 
-// TODO: Implement logger
+void log(char* path, char* message);
 
 
 #endif // _LOGGER_H
